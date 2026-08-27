@@ -1,0 +1,372 @@
+.expiry-management-page {
+  padding: 24px;
+  background: #f7f8fa;
+  min-height: 100vh;
+}
+
+.expiry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.expiry-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.expiry-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+}
+
+.expiry-refresh-btn {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.expiry-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------
+   Summary
+--------------------------------- */
+
+.expiry-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.expiry-summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.expiry-summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.expiry-summary-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.expiry-summary-card strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 26px;
+  color: #111827;
+}
+
+.expiry-summary-card.selected {
+  box-shadow: 0 0 0 2px #111827;
+}
+
+.expiry-summary-card.expired {
+  border-left: 4px solid #991b1b;
+}
+
+.expiry-summary-card.critical {
+  border-left: 4px solid #ef4444;
+}
+
+.expiry-summary-card.warning {
+  border-left: 4px solid #f97316;
+}
+
+.expiry-summary-card.alert {
+  border-left: 4px solid #eab308;
+}
+
+.expiry-summary-card.good {
+  border-left: 4px solid #22c55e;
+}
+
+.expiry-summary-card.no-date {
+  border-left: 4px solid #9ca3af;
+}
+
+/* ---------------------------------
+   Toolbar
+--------------------------------- */
+
+.expiry-toolbar {
+  background: #ffffff;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.expiry-search {
+  width: 420px;
+  max-width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+}
+
+.expiry-search:focus {
+  border-color: #6b7280;
+}
+
+.expiry-filter {
+  padding: 11px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #ffffff;
+  outline: none;
+}
+
+.expiry-result-count {
+  margin-left: auto;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ---------------------------------
+   Table
+--------------------------------- */
+
+.expiry-table-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  overflow-x: auto;
+}
+
+.expiry-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 950px;
+}
+
+.expiry-table th {
+  padding: 13px 15px;
+  text-align: left;
+  background: #f9fafb;
+  color: #4b5563;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.expiry-table td {
+  padding: 14px 15px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.expiry-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* ---------------------------------
+   Product
+--------------------------------- */
+
+.expiry-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.expiry-product-image {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.expiry-product-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.expiry-product-code {
+  margin-top: 3px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.expiry-batch {
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.expiry-not-set {
+  color: #9ca3af;
+}
+
+/* ---------------------------------
+   Days
+--------------------------------- */
+
+.expiry-days {
+  font-weight: 600;
+}
+
+.expiry-days.good {
+  color: #15803d;
+}
+
+.expiry-days.alert {
+  color: #a16207;
+}
+
+.expiry-days.warning {
+  color: #c2410c;
+}
+
+.expiry-days.critical {
+  color: #dc2626;
+}
+
+.expiry-days.expired {
+  color: #991b1b;
+}
+
+.expiry-days.no-date {
+  color: #9ca3af;
+}
+
+/* ---------------------------------
+   Status
+--------------------------------- */
+
+.expiry-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.expiry-status.good {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.expiry-status.alert {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.expiry-status.warning {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.expiry-status.critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.expiry-status.expired {
+  background: #7f1d1d;
+  color: #ffffff;
+}
+
+.expiry-status.no-date {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ---------------------------------
+   States
+--------------------------------- */
+
+.expiry-loading {
+  background: #ffffff;
+  padding: 50px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.expiry-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 7px;
+  margin-bottom: 15px;
+}
+
+.expiry-empty {
+  padding: 50px !important;
+  text-align: center;
+  color: #9ca3af;
+}
+
+/* ---------------------------------
+   Responsive
+--------------------------------- */
+
+@media (max-width: 1100px) {
+  .expiry-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .expiry-management-page {
+    padding: 15px;
+  }
+
+  .expiry-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .expiry-header h1 {
+    font-size: 22px;
+  }
+
+  .expiry-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .expiry-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expiry-search {
+    width: 100%;
+  }
+
+  .expiry-filter {
+    width: 100%;
+  }
+
+  .expiry-result-count {
+    margin-left: 0;
+    text-align: right;
+  }
+}
