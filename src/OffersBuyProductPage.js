@@ -79,7 +79,7 @@ const OffersBuyProduct = () => {
 
   const fetchProfileType = useCallback(async () => {
     try {
-      const API_URL = `https://localhost:7091/api/Address/GetAddressById/`;
+      const API_URL = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/`;
       const response = await fetch(`${API_URL}${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -123,7 +123,9 @@ const OffersBuyProduct = () => {
 
   useEffect(() => {
     axios
-      .get(`https://localhost:7091/api/MasterData/getStates`)
+      .get(
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+      )
       .then((response) => {
         const data = response.data;
         console.log("States API Response:", data);
@@ -138,7 +140,9 @@ const OffersBuyProduct = () => {
   useEffect(() => {
     if (stateId) {
       axios
-        .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
+        .get(
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+        )
         .then((response) => {
           setDistrictList(response.data);
         })
@@ -240,7 +244,7 @@ const OffersBuyProduct = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/BuyProduct/BuyProductUpload`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/BuyProductUpload`,
         {
           method: "POST",
           headers: {
@@ -388,7 +392,7 @@ const OffersBuyProduct = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Customer/CustomerAddressEdit`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: {
@@ -427,7 +431,7 @@ const OffersBuyProduct = () => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/Product/${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch products");

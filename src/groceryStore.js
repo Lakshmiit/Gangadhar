@@ -11,7 +11,8 @@ import axios from "axios";
 // CACHE_TTL_MS, because the last good response is mirrored into
 // sessionStorage (cleared automatically when the tab closes).
 
-const API_BASE = "https://localhost:7091/api";
+const API_BASE =
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_ALL_GROCERY_ITEMS = `${API_BASE}/UploadGrocery/GetAllGroceryItems`;
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — tune to how often the catalog actually changes

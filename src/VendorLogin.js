@@ -29,7 +29,7 @@ export default function VendorLogin() {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/VendorRegistration/GetVendorDetailsByUserNameAndPassword?userName=${encodeURIComponent(
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/GetVendorDetailsByUserNameAndPassword?userName=${encodeURIComponent(
           login.userName.trim(),
         )}&password=${encodeURIComponent(login.password.trim())}`,
       );

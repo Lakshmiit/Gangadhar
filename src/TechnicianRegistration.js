@@ -127,7 +127,7 @@
 //       useEffect(() => {
 //     const fetchStates = async () => {
 //       try {
-//         const res = await fetch('https://localhost:7091/api/MasterData/getStates');
+//         const res = await fetch('https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates');
 //         const data = await res.json();
 //         setStates(data);
 //       } catch (err) {
@@ -141,7 +141,7 @@
 //     const fetchDistricts = async () => {
 //       if (!selectedStateId) return;
 //       try {
-//         const res = await fetch(`https://localhost:7091/api/MasterData/getDistricts?stateId=${selectedStateId}`);
+//         const res = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts?stateId=${selectedStateId}`);
 //         const data = await res.json();
 //         setDistricts(data);
 //       } catch (err) {
@@ -176,7 +176,7 @@
 //         };
 
 //     try {
-//       const response1 = await fetch(`https://localhost:7091/api/UserOnBoarding/UserUpload`, {
+//       const response1 = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/UserUpload`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@
 //           Landmark: landmark,
 //         };
 
-//           const response2 = await fetch(`https://localhost:7091/api/Technician/TechnicianUpload`, {
+//           const response2 = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Technician/TechnicianUpload`, {
 //             method: 'POST',
 //             headers: {
 //               'Content-Type': 'application/json',
@@ -259,7 +259,7 @@
 //     //     };
 
 //     //     try {
-//     //       const response1 = await fetch(`https://localhost:7091/api/UserOnBoarding/UserUpload`, {
+//     //       const response1 = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/UserUpload`, {
 //     //         method: 'POST',
 //     //         headers: {
 //     //           'Content-Type': 'application/json',
@@ -303,7 +303,7 @@
 //     //       Landmark: landmark,
 //     //     };
 
-//     //       const response2 = await fetch(`https://localhost:7091/api/Technician/TechnicianUpload`, {
+//     //       const response2 = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Technician/TechnicianUpload`, {
 //     //         method: 'POST',
 //     //         headers: {
 //     //           'Content-Type': 'application/json',

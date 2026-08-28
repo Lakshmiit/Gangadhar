@@ -214,7 +214,7 @@ const GroceryCard = () => {
     const fetchVendorProductLimits = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7091/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
             vendorData.vendorId,
           )}`,
           {
@@ -477,7 +477,7 @@ const GroceryCard = () => {
   //   async function fetchProductsAndFirstImages() {
   //     try {
   //       setImageLoading(true);
-  //       const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
+  //       const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
   //       const { data: items } = await axios.get(url, { signal: controller.signal });
   //       const safeItems = Array.isArray(items) ? items : [];
   //       if (cancelled) return;
@@ -506,7 +506,7 @@ const GroceryCard = () => {
   //       const fetchOne = async ({ productId, photo }) => {
   //         try {
   //           const res = await fetch(
-  //             `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
+  //             `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
   //             { signal: controller.signal }
   //           );
   //           const json = await res.json();
@@ -554,7 +554,7 @@ const GroceryCard = () => {
     const fetchProducts = async () => {
       try {
         const url =
-          `https://localhost:7091/` +
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/` +
           `api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(
             decodedCat,
           )}`;
@@ -623,7 +623,7 @@ const GroceryCard = () => {
   // async function fetchProductsAndFirstImages(warm = false, signal) {
   // try {
   // if (!warm) setImageLoading(true);
-  // const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
+  // const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
   // const { data: items } = await axios.get(url, { signal });
   // const safeItems = Array.isArray(items) ? items : [];
   // if (cancelled) return;
@@ -661,7 +661,7 @@ const GroceryCard = () => {
   // const fetchOne = async ({ productId, photo }) => {
   // try {
   // const res = await fetch(
-  // `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
+  // `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
   //               { signal }
   // );
   // const json = await res.json();

@@ -48,7 +48,7 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Auth/bhashsmssendotp`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Auth/bhashsmssendotp`,
         {
           method: "POST",
           headers: {

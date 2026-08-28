@@ -22,14 +22,14 @@ const ProductAdmin = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/Product/${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
         );
         const data = await response.json();
         setProductData(data);
         const imageRequests =
           data.productPhotos?.map((photo) =>
             fetch(
-              `https://localhost:7091/api/FileUpload/download?generatedfilename=${photo}`,
+              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
             )
               .then((res) => res.json())
               .then((data) => ({
@@ -67,13 +67,16 @@ const ProductAdmin = () => {
       numberOfStockAvailable,
     };
     try {
-      const response = await fetch(`https://localhost:7091/api/Product/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
       if (response.ok) {
         alert("Product status updated successfully.");
         navigate(`/adminProductList/Admin`);

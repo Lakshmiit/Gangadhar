@@ -31,7 +31,7 @@ const VendorGroceryList = () => {
     (async () => {
       setLoading(true);
       try {
-        const url = `https://localhost:7091/api/VendorRegistration/GetVendorGroceryListByVendorId?vendorId=${vendorId}`;
+        const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/GetVendorGroceryListByVendorId?vendorId=${vendorId}`;
         const { data } = await axios.get(url);
         const groceries = (Array.isArray(data) ? data : []).map((g) => ({
           ...g,
@@ -72,7 +72,7 @@ const VendorGroceryList = () => {
       return;
     try {
       await axios.delete(
-        `https://localhost:7091/api/UploadGrocery?id=${groceryId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery?id=${groceryId}`,
       );
       const prune = (arr) => arr.filter((g) => g.id !== groceryId);
       setFinalGroceries((prev) => prune(prev));

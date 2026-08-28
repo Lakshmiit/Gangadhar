@@ -14,12 +14,13 @@ import ImageCache from "./utils/ImageCache";
 import { getImageFilename, imageValueToUrl } from "./utils/imageSource";
 
 // NOTE: every other file in this project talks to
-// "https://localhost:7091/api". This page instead points at the QA host
+// "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api". This page instead points at the QA host
 // below because that's the exact endpoint given for
 // GetVendorOrdersByVendorId. If your local/dev backend also serves this
 // route (and DeliveryPartner/GetAllDeliveryPartners + Mart/UpdateProductDetails),
 // swap API_BASE back to the localhost one to match the rest of the app.
-const API_BASE = "https://localhost:7091/api";
+const API_BASE =
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_VENDOR_ORDERS = `${API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const GET_ALL_DELIVERY_PARTNERS = `${API_BASE}/DeliveryPartner/GetAllDeliveryPartners`;
 const UPDATE_ORDER = `${API_BASE}/Mart/UpdateProductDetails`;

@@ -100,7 +100,7 @@ const OTPVerificationPage = () => {
       setCanResend(false);
 
       const response = await fetch(
-        `https://localhost:7091/api/Auth/bhashsmssendotp`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Auth/bhashsmssendotp`,
         {
           method: "POST",
           headers: {
@@ -120,7 +120,7 @@ const OTPVerificationPage = () => {
   const checkAddressAndNavigate = async (userId, profileType = "customer") => {
     try {
       const response = await axios.get(
-        `https://localhost:7091/api/Address/GetAddressById/${userId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       const data = Array.isArray(response.data)
         ? response.data[0]
@@ -158,7 +158,7 @@ const OTPVerificationPage = () => {
 
     try {
       const response1 = await fetch(
-        `https://localhost:7091/api/UserOnBoarding/GuestUserUpload`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/GuestUserUpload`,
         {
           method: "POST",
           headers: {
@@ -205,7 +205,7 @@ const OTPVerificationPage = () => {
       };
 
       const response2 = await fetch(
-        `https://localhost:7091/api/Customer/GuestCustomerUpload`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/GuestCustomerUpload`,
         {
           method: "POST",
           headers: {
@@ -236,7 +236,7 @@ const OTPVerificationPage = () => {
       // };
       // console.log("Payload3:", payload3);
       // const response3 = await fetch(
-      //   `https://localhost:7091/api/OffersTransactions/UploadOffersTransactionsDetails`,
+      //   `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/OffersTransactions/UploadOffersTransactionsDetails`,
       //   {
       //     method: "POST",
       //     headers: {
@@ -282,7 +282,7 @@ const OTPVerificationPage = () => {
       };
 
       const otpResponse = await fetch(
-        `https://localhost:7091/api/Auth/validateotp`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Auth/validateotp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -297,7 +297,7 @@ const OTPVerificationPage = () => {
 
       // STEP 2 — Check if user exists
       const verifyUserRes = await fetch(
-        `https://localhost:7091/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${mobile}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${mobile}`,
       );
 
       if (verifyUserRes.status === 200) {

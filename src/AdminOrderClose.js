@@ -14,9 +14,9 @@ import axios from "axios";
 // TODO: make sure these match the actual values/imports used elsewhere in
 // your app (same ones your decrement handler already relies on).
 const GET_VENDOR_PRODUCTS_URL =
-  "https://localhost:7091/api/Vendor/GetVendorProducts";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/GetVendorProducts";
 const UPDATE_VENDOR_PRODUCTS_URL =
-  "https://localhost:7091/api/Vendor/UpdateVendorProducts";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/UpdateVendorProducts";
 
 const normalizeName = (name) => (name || "").toString().trim().toLowerCase();
 
@@ -146,7 +146,7 @@ const AdminOrderClose = () => {
       const ctrl = new AbortController();
       try {
         const res1 = await fetch(
-          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
           { signal: ctrl.signal },
         );
         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -179,7 +179,7 @@ const AdminOrderClose = () => {
         }
 
         const requests = productNames.map(async (name) => {
-          const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+          const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
             name,
           )}`;
           const res = await fetch(url, { signal: ctrl.signal });
@@ -221,7 +221,7 @@ const AdminOrderClose = () => {
     const fetchDeliveryPartners = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7091/api/DeliveryPartner/GetAllDeliveryPartners`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/DeliveryPartner/GetAllDeliveryPartners`,
         );
         const partners = response.data.filter(
           (partner) => partner.status === "open",
@@ -238,7 +238,7 @@ const AdminOrderClose = () => {
     const fetchGroceryData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch grocery product data");
@@ -351,7 +351,7 @@ const AdminOrderClose = () => {
       };
 
       let response = await fetch(
-        `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: {
@@ -508,7 +508,7 @@ const AdminOrderClose = () => {
   const handleCancelOrder = async () => {
     try {
       const detailsResponse = await fetch(
-        `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
       );
       if (!detailsResponse.ok)
         throw new Error("Failed to fetch latest order details");
@@ -525,7 +525,7 @@ const AdminOrderClose = () => {
       };
 
       const cancelResponse = await fetch(
-        `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -917,7 +917,7 @@ const AdminOrderClose = () => {
           if (!item.image) return;
           try {
             const res = await fetch(
-              `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
                 item.image,
               )}`,
               { signal: controller.signal },

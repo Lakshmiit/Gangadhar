@@ -269,7 +269,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await fetch(
-//         "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
+//         "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
 //         {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
@@ -611,7 +611,9 @@ const VendorRegisterPage = () => {
   // Fetch all states on mount
   useEffect(() => {
     axios
-      .get("https://localhost:7091/api/MasterData/getStates")
+      .get(
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates",
+      )
       .then((response) => setStateList(response.data))
       .catch((error) => console.error("Error fetching states:", error));
   }, []);
@@ -621,7 +623,9 @@ const VendorRegisterPage = () => {
     if (stateId) {
       setLoadingDistricts(true);
       axios
-        .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
+        .get(
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+        )
         .then((response) => setDistrictList(response.data || []))
         .catch((error) => {
           console.error("Error fetching districts:", error);
@@ -638,7 +642,9 @@ const VendorRegisterPage = () => {
     if (districtId) {
       setLoadingPincodes(true);
       axios
-        .get(`https://localhost:7091/api/MasterData/getPincodes/${districtId}`)
+        .get(
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getPincodes/${districtId}`,
+        )
         .then((response) => setPincodeOptions(response.data || []))
         .catch((error) => {
           console.error("Error fetching pincodes:", error);
@@ -835,7 +841,7 @@ const VendorRegisterPage = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

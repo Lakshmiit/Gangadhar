@@ -20,7 +20,8 @@ import ImageCache from "./utils/ImageCache";
 import { getGroceryItems, getLiveGroceryStock } from "./utils/groceryStore";
 import { getVendorProductsByVendorId } from "./utils/vendorListStore";
 // Same backend the customer-facing Profile page (and Admin grocery pages) use.
-const API_BASE = "https://localhost:7091/api";
+const API_BASE =
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const ADD_GROCERY_ITEM = `${API_BASE}/UploadGrocery/UploadGrocery`;
 const IMAGE_DOWNLOAD = `${API_BASE}/FileUpload/download?generatedfilename=`;
 const IMAGE_UPLOAD = `${API_BASE}/FileUpload/upload?filename=`;

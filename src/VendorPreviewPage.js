@@ -13,7 +13,7 @@
 // } from "./utils/vendorListStore";
 
 // const VENDOR_UPLOAD_PRODUCTS_API =
-//   "https://localhost:7091/api/VendorUploadProducts/vendorUploadProducts";
+//   "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/vendorUploadProducts";
 // // Updates an EXISTING vendor record by id. The backend replaces the whole
 // // record with whatever we send, so the caller (handleSubmitFinal below) is
 // // responsible for merging newly-picked products into the vendor's
@@ -22,7 +22,7 @@
 // // the previously approved/pending items and metadata on this record would
 // // be wiped out.
 // const VENDOR_UPDATE_PRODUCTS_API =
-//   "https://localhost:7091/api/VendorUploadProducts/UpdateVendorProductsValues";
+//   "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/UpdateVendorProductsValues";
 
 // // Category display-order key: an array of category names, in the order
 // // the vendor has arranged them via the up/down arrows on this page. Kept
@@ -37,9 +37,9 @@
 // const pendingCartKey = (vendorId) => `vendorPendingProducts_${vendorId}`;
 
 // // Orders bell on this page polls the same endpoint VendorOrdersPage reads
-// // from. NOTE: this is the QA host, not the "localhost:7091" base used
+// // from. NOTE: this is the QA host, not the "lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net" base used
 // // elsewhere in this file — see VendorOrdersPage.js for why.
-// const ORDERS_API_BASE = "https://localhost:7091/api";
+// const ORDERS_API_BASE = "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 // const GET_VENDOR_ORDERS = `${ORDERS_API_BASE}/Mart/GetVendorOrdersByVendorId`;
 // const ORDERS_POLL_INTERVAL_MS = 25000;
 
@@ -906,7 +906,7 @@ import {
 } from "./utils/vendorListStore";
 
 const VENDOR_UPLOAD_PRODUCTS_API =
-  "https://localhost:7091/api/VendorUploadProducts/vendorUploadProducts";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/vendorUploadProducts";
 // Updates an EXISTING vendor record by id. The backend replaces the whole
 // record with whatever we send, so the caller (handleSubmitFinal below) is
 // responsible for merging newly-picked products into the vendor's
@@ -915,7 +915,7 @@ const VENDOR_UPLOAD_PRODUCTS_API =
 // the previously approved/pending items and metadata on this record would
 // be wiped out.
 const VENDOR_UPDATE_PRODUCTS_API =
-  "https://localhost:7091/api/VendorUploadProducts/UpdateVendorProductsValues";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/UpdateVendorProductsValues";
 
 // Category display-order key: an array of category names, in the order
 // the vendor has arranged them via the up/down arrows on this page. Kept
@@ -935,9 +935,10 @@ const categoryOrderKey = (vendorId) => `vendorCategoryOrder_${vendorId}`;
 const pendingCartKey = (vendorId) => `vendorPendingProducts_${vendorId}`;
 
 // Orders bell on this page polls the same endpoint VendorOrdersPage reads
-// from. NOTE: this is the QA host, not the "localhost:7091" base used
+// from. NOTE: this is the QA host, not the "lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net" base used
 // elsewhere in this file — see VendorOrdersPage.js for why.
-const ORDERS_API_BASE = "https://localhost:7091/api";
+const ORDERS_API_BASE =
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_VENDOR_ORDERS = `${ORDERS_API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const ORDERS_POLL_INTERVAL_MS = 25000;
 

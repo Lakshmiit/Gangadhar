@@ -57,7 +57,7 @@
 
 //     // Fetch data from API on component mount
 //     useEffect(() => {
-//       const apiUrl = `https://localhost:7091/api/RaiseAQuote/GetRaiseAQuoteDetailsByid?raiseAQuotetId=${raiseTicketId}`;
+//       const apiUrl = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseAQuote/GetRaiseAQuoteDetailsByid?raiseAQuotetId=${raiseTicketId}`;
 //       const fetchData = async () => {
 //         try {
 //           const response = await fetch(apiUrl);
@@ -137,7 +137,7 @@
 //   useEffect(() => {
 //         const fetchticketData = async () => {
 //           try {
-//             const response = await fetch(`https://localhost:7091/api/RaiseTicket/GetTicket/${raiseTicketId}`);
+//             const response = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/GetTicket/${raiseTicketId}`);
 //             if (!response.ok) {
 //               throw new Error('Failed to fetch ticket data');
 //             }
@@ -257,7 +257,7 @@
 //     };
 //     try {
 
-//       const response = await fetch(`https://localhost:7091/api/RaiseTicket/${raiseTicketId}`, {
+//       const response = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${raiseTicketId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -307,7 +307,7 @@
 // })),
 //   };
 //   try {
-//     const response = await fetch(`https://localhost:7091/api/RaiseAQuoteByDealer/CreateRaiseAQuoteByDealer`, {
+//     const response = await fetch(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseAQuoteByDealer/CreateRaiseAQuoteByDealer`, {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
