@@ -219,7 +219,7 @@ const MartHomeAppliances = () => {
     async function fetchProductsAndFirstImages(warm = false, signal) {
       try {
         if (!warm) setImageLoading(true);
-        const url = `https://localhost:7091/api/Product/GetProductsByCategory?Category=${encodeURIComponent(
+        const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?Category=${encodeURIComponent(
           decodedCat,
         )}`;
         const { data } = await axios.get(url, { signal });

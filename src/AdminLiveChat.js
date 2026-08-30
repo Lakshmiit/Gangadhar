@@ -32,7 +32,8 @@ import Footer from "./Footer.js";
 import "./App.css";
 
 const API = "/api";
-const BACKEND = "https://localhost:7091/api";
+const BACKEND =
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 const POLL_MS = 4000;
 
 /* ── Voice Player (no raw base64 shown) ── */

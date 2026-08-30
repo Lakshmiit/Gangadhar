@@ -20,7 +20,7 @@ const AdminGroceryApproval = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/UploadGrocery/GetGroceryItems/${id}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItems/${id}`,
         );
         const data = await response.json();
         setGroceryData(data);
@@ -28,7 +28,7 @@ const AdminGroceryApproval = () => {
         const imageRequests =
           data.images?.map((photo) =>
             fetch(
-              `https://localhost:7091/api/FileUpload/download?generatedfilename=${photo}`,
+              `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
             )
               .then((res) => res.json())
               .then((data) => ({
@@ -68,7 +68,7 @@ const AdminGroceryApproval = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/UploadGrocery/UpdateGroceryItems?id=${id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/UpdateGroceryItems?id=${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

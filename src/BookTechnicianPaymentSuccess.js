@@ -20,7 +20,7 @@
 // }, [loading, orderBooking]);
 
 // useEffect(() => {
-//     fetch(`https://localhost:7091/api/BookTechnician/GetBookTechnician/${id}`)
+//     fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnician/${id}`)
 //       .then((res) => res.json())
 //       .then((data) => {
 //         setOrderBooking(data);
@@ -51,7 +51,7 @@
 //         };
 
 //         const response = await fetch(
-//           "https://localhost:7091/api/BookTechnician/bookTechnicianEdit",
+//           "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/bookTechnicianEdit",
 //           {
 //             method: "POST",
 //             headers: { "Content-Type": "application/json" },

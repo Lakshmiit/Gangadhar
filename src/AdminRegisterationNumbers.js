@@ -41,7 +41,7 @@ const AdminRegistrationNumbers = () => {
 
     try {
       const res = await axios.get(
-        `https://localhost:7091/api/Customer/GuestUserExistingVerification/${mobileNumber}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/GuestUserExistingVerification/${mobileNumber}`,
       );
       console.log("[Step 1] Response:", res.data);
 
@@ -71,7 +71,7 @@ const AdminRegistrationNumbers = () => {
 
     try {
       const txRes = await axios.get(
-        `https://localhost:7091/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
       );
       console.log("[Step 2] Response:", txRes.data);
 
@@ -138,7 +138,7 @@ const AdminRegistrationNumbers = () => {
 
         console.log("[Step 3] POST payload:", postPayload);
         const postRes = await axios.post(
-          `https://localhost:7091/api/OffersTransactions/UploadOffersTransactionsDetails`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UploadOffersTransactionsDetails`,
           postPayload,
         );
         console.log("[Step 3] POST response:", postRes.data);
@@ -174,7 +174,7 @@ const AdminRegistrationNumbers = () => {
 
         console.log("[Step 3] PUT payload:", putPayload);
         const putRes = await axios.put(
-          `https://localhost:7091/api/OffersTransactions/UpdateOffersTransactionsDetails/${transactionData.id}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UpdateOffersTransactionsDetails/${transactionData.id}`,
           putPayload,
         );
         console.log("[Step 3] PUT response:", putRes.data);
@@ -474,7 +474,7 @@ export default AdminRegistrationNumbers;
 //   setLoading(true);
 
 //   try {
-//     const response = await fetch(`https://localhost:7091/api/Customer/GuestUserExistingVerification/${mobileNumber}`);
+//     const response = await fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/GuestUserExistingVerification/${mobileNumber}`);
 //     if (!response.ok) {
 //       throw new Error('Failed to fetch user data');
 //     }

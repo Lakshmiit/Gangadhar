@@ -58,7 +58,7 @@ const CategoryIcons = () => {
       setError("");
 
       const encodedCategory = encodeURIComponent(value);
-      const url = `https://localhost:7091/api/Product/GetProductsByCategory?Category=${encodedCategory}`;
+      const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?Category=${encodedCategory}`;
       const response = await axios.get(url);
       const productsData = response.data;
 

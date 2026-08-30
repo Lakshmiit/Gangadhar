@@ -40,7 +40,7 @@ export default function HandymanTrackingMap() {
     const fetchGroceryData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/Mart/GetProductDetails?id=${id}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${id}`,
         );
         if (!response.ok) throw new Error("Failed to fetch ticket data");
         const data = await response.json();

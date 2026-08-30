@@ -15,7 +15,7 @@
 
 //   const fetchProducts = async () => {
 //     try {
-//       const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(
+//       const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(
 //         selectedCategory
 //       )}`;
 
@@ -31,7 +31,7 @@
 //           if (p.images?.[0]) {
 //             try {
 //               const res = await fetch(
-//                 `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+//                 `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
 //                   p.images[0]
 //                 )}`
 //               );

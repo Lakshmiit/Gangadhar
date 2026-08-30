@@ -44,7 +44,7 @@ const UserIdLogin = () => {
 
       // Call your API with username & password
       const response = await fetch(
-        `https://localhost:7091/api/UserOnBoarding/VerifyUserLogin?username=${userName}&password=${userPassword}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UserOnBoarding/VerifyUserLogin?username=${userName}&password=${userPassword}`,
         {
           method: "GET",
         },
@@ -201,11 +201,12 @@ const UserIdLogin = () => {
                         Visakhapatnam - 530016 ("Lakshmi Sai Service Provider"
                         "we," or "our") that governs your use of the search
                         services offered by Lakshmi Sai Service Providers
-                        through its website https://localhost:7091 ("Website"),
-                        using which Lakshmi Sai Service Providers may provide
-                        the search services ("Platform"). When you access or use
-                        Platform you agree to be bound by these Terms and
-                        Conditions ("Terms").
+                        through its website
+                        https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net
+                        ("Website"), using which Lakshmi Sai Service Providers
+                        may provide the search services ("Platform"). When you
+                        access or use Platform you agree to be bound by these
+                        Terms and Conditions ("Terms").
                       </p>
                     </div>
                     <div className="mt-20">

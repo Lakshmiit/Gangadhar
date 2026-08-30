@@ -79,7 +79,7 @@
 //   useEffect(() => {
 //     const fetchProfileType = async () => {
 //       try {
-//         const API_URL = "https://localhost:7091/api/Address/GetAddressById/";
+//         const API_URL = "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/";
 //         //alert(userId);
 //         const response = await fetch(`${API_URL}${userId}`);
 
@@ -172,7 +172,7 @@
 //     };
 
 //     try {
-//       const response = await fetch(`https://localhost:7091/api/BuyProduct/BuyProductUpload`,{
+//       const response = await fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/BuyProductUpload`,{
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -240,7 +240,7 @@
 // //     };
 
 // //     try {
-// //       const response = await fetch(`https://localhost:7091/api/BuyProduct/BuyProductUpload`,{
+// //       const response = await fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/BuyProductUpload`,{
 // //         method: 'POST',
 // //         headers: {
 // //           'Content-Type': 'application/json',
@@ -393,7 +393,7 @@
 //     const fetchProducts = async () => {
 //       try {
 //         const response = await axios.get(
-//           `https://localhost:7091/api/Product/GetProductsByCategory?category=${category}`
+//           `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?category=${category}`
 //         );
 //         setAllProducts(response.data);
 //         // alert(JSON.stringify(allProducts));

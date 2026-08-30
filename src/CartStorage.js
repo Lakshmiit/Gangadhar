@@ -8,7 +8,7 @@ export const MAIN_STORE_ID = "LMART";
 export const fileToUrl = (fn) => {
   if (!fn) return null;
   if (fn.startsWith("http")) return fn;
-  return `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(fn)}`;
+  return `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(fn)}`;
 };
 
 /* ---------------- CLEAN DATA ---------------- */

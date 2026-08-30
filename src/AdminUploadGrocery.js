@@ -95,7 +95,8 @@ const AdminUploadGrocery = () => {
       formData.append("fileName", fileName);
 
       const response = await fetch(
-        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
+          fileName,
         {
           method: "POST",
           headers: {
@@ -161,7 +162,7 @@ const AdminUploadGrocery = () => {
     };
     try {
       const response = await fetch(
-        `https://localhost:7091/api/UploadGrocery/UploadGrocery`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/UploadGrocery`,
         {
           method: "POST",
           headers: {

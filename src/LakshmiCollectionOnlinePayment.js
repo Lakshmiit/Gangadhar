@@ -17,7 +17,7 @@
 
 //   // ✅ Step 1: Fetch booking details from your API
 //   useEffect(() => {
-//     fetch(`https://localhost:7091/api/LakshmiCollection/GetLakshmiCollectionDetails/${collectionId}`)
+//     fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${collectionId}`)
 //       .then((res) => res.json())
 //       .then((data) => {
 //         setOrderBooking(data);

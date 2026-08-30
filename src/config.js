@@ -3,4 +3,4 @@ export const appConfig = {
 };
 
 // ${appConfig.apiBaseUrl}
-// https://localhost:7091
+// https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net

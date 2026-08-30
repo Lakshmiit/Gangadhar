@@ -315,7 +315,7 @@
 //       const ctrl = new AbortController();
 //       try {
 //         const res1 = await fetch(
-//           `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
+//           `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
 //           { signal: ctrl.signal },
 //         );
 //         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -356,7 +356,7 @@
 //           return;
 //         }
 //         const requests = productNames.map(async (name) => {
-//           const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+//           const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
 //             name,
 //           )}`;
 //           const res = await fetch(url, { signal: ctrl.signal });
@@ -395,7 +395,7 @@
 
 //   // const getReferralRecord = async (userId) => {
 //   // if (!userId) return null;
-//   // const url = `https://localhost:7091/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
+//   // const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
 //   // const res = await fetch(url);
 //   // const text = await res.text();
 //   // let data = [];
@@ -437,7 +437,7 @@
 //   const fetchCustomerData = useCallback(async () => {
 //     try {
 //       const response = await fetch(
-//         `https://localhost:7091/api/Address/GetAddressById/${userId}`,
+//         `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
 //       );
 //       if (!response.ok) {
 //         throw new Error("Failed to fetch customer profile data");
@@ -489,7 +489,7 @@
 //     const fetchOfferWalletAmount = async () => {
 //       try {
 //         const response = await fetch(
-//           `https://localhost:7091/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
+//           `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
 //         );
 //         if (!response.ok) throw new Error("Failed to fetch offer transaction");
 
@@ -528,7 +528,7 @@
 
 //   useEffect(() => {
 //     axios
-//       .get(`https://localhost:7091/api/MasterData/getStates`)
+//       .get(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`)
 //       .then((response) => {
 //         const data = response.data;
 //         console.log("States API Response:", data);
@@ -543,7 +543,7 @@
 //   useEffect(() => {
 //     if (stateId) {
 //       axios
-//         .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
+//         .get(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`)
 //         .then((response) => {
 //           setDistrictList(response.data);
 //         })
@@ -619,7 +619,7 @@
 
 //     try {
 //       const response = await fetch(
-//         `https://localhost:7091/api/Customer/CustomerAddressEdit`,
+//         `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
 //         {
 //           method: "POST",
 //           headers: {
@@ -719,7 +719,7 @@
 //     };
 //     console.log("📦 Mart Payload:", payload);
 //     const response = await fetch(
-//       `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+//       `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
 //       {
 //         method: "PUT",
 //         headers: { "Content-Type": "application/json" },
@@ -756,10 +756,10 @@
 //     console.log("📦 Offers Transaction Payload:", offersTransactionPayload);
 //     console.log(
 //       "📦 PUT URL:",
-//       `https://localhost:7091/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
+//       `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
 //     );
 //     const response = await fetch(
-//       `https://localhost:7091/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
+//       `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
 //       {
 //         method: "PUT",
 //         headers: { "Content-Type": "application/json" },
@@ -862,7 +862,7 @@
 //           Limit: item.limit || 0,
 //         };
 //         const res = await fetch(
-//           `https://localhost:7091/api/UploadGrocery/UpdateGroceryItems?id=${encodeURIComponent(item.id)}`,
+//           `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/UpdateGroceryItems?id=${encodeURIComponent(item.id)}`,
 //           {
 //             method: "PUT",
 //             headers: { "Content-Type": "application/json" },
@@ -890,7 +890,7 @@
 //       const mobileNumber =
 //         primaryAddress?.mobileNumber || primaryAddress?.mobileNumber;
 //       const response = await fetch(
-//         `https://localhost:7091/api/Auth/sendLmartsms`,
+//         `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Auth/sendLmartsms`,
 //         {
 //           method: "POST",
 //           headers: {
@@ -1532,9 +1532,9 @@ import { invalidateVendorProductsCache } from "./utils/vendorListStore";
 // import { appConfig } from "./config";
 
 const GET_VENDOR_PRODUCTS_URL =
-  "https://localhost:7091/api/VendorUploadProducts/GetVendorProductsvalues";
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues";
 const UPDATE_VENDOR_PRODUCTS_URL =
-  "https://localhost:7091/api/VendorUploadProducts/UpdateVendorProductsValues";
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorUploadProducts/UpdateVendorProductsValues";
 
 const DEFAULT_CASHBACK_RULES = [
   { minAmount: 499, maxAmount: 998, cashback: 30 },
@@ -1840,7 +1840,7 @@ const GroceryPaymentmethod = () => {
       const ctrl = new AbortController();
       try {
         const res1 = await fetch(
-          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
           { signal: ctrl.signal },
         );
         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -1881,7 +1881,7 @@ const GroceryPaymentmethod = () => {
           return;
         }
         const requests = productNames.map(async (name) => {
-          const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+          const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
             name,
           )}`;
           const res = await fetch(url, { signal: ctrl.signal });
@@ -1920,7 +1920,7 @@ const GroceryPaymentmethod = () => {
 
   // const getReferralRecord = async (userId) => {
   // if (!userId) return null;
-  // const url = `https://localhost:7091/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
+  // const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
   // const res = await fetch(url);
   // const text = await res.text();
   // let data = [];
@@ -1962,7 +1962,7 @@ const GroceryPaymentmethod = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Address/GetAddressById/${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -2014,7 +2014,7 @@ const GroceryPaymentmethod = () => {
     const fetchOfferWalletAmount = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
         );
         if (!response.ok) throw new Error("Failed to fetch offer transaction");
 
@@ -2053,7 +2053,9 @@ const GroceryPaymentmethod = () => {
 
   useEffect(() => {
     axios
-      .get(`https://localhost:7091/api/MasterData/getStates`)
+      .get(
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+      )
       .then((response) => {
         const data = response.data;
         console.log("States API Response:", data);
@@ -2068,7 +2070,9 @@ const GroceryPaymentmethod = () => {
   useEffect(() => {
     if (stateId) {
       axios
-        .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
+        .get(
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+        )
         .then((response) => {
           setDistrictList(response.data);
         })
@@ -2144,7 +2148,7 @@ const GroceryPaymentmethod = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Customer/CustomerAddressEdit`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: {
@@ -2255,7 +2259,7 @@ const GroceryPaymentmethod = () => {
   // };
 
   // let response = await fetch(
-  // `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+  // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
   // {
   // method: "PUT",
   // headers: { "Content-Type": "application/json" },
@@ -2280,7 +2284,7 @@ const GroceryPaymentmethod = () => {
   // // };
 
   // // let resp = await fetch(
-  // // `https://localhost:7091/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(id)}`,
+  // // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(id)}`,
   // // {
   // // method: "PUT",
   // // headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -2290,7 +2294,7 @@ const GroceryPaymentmethod = () => {
 
   // // if (!resp.ok) {
   // // resp = await fetch(
-  // // `https://localhost:7091/api/ReferralPoints/UpdateReferralPoints/${encodeURIComponent(id)}`,
+  // // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/UpdateReferralPoints/${encodeURIComponent(id)}`,
   // // {
   // // method: "PUT",
   // // headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -2316,7 +2320,7 @@ const GroceryPaymentmethod = () => {
 
   // // if (selectedPayment === "online") {
   // // response = await fetch(
-  // // `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+  // // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
   // // {
   // // method: "PUT",
   // // headers: {
@@ -2339,7 +2343,7 @@ const GroceryPaymentmethod = () => {
   // // window.location.href = `/groceryOnlinePayment/${groceryItemId}`;
   // // } else if (selectedPayment === "cash") {
   // // response = await fetch(
-  // // `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+  // // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
   // // {
   // // method: "PUT",
   // // headers: {
@@ -2419,7 +2423,7 @@ const GroceryPaymentmethod = () => {
     };
     console.log("📦 Mart Payload:", payload);
     const response = await fetch(
-      `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
+      `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -2456,10 +2460,10 @@ const GroceryPaymentmethod = () => {
     console.log("📦 Offers Transaction Payload:", offersTransactionPayload);
     console.log(
       "📦 PUT URL:",
-      `https://localhost:7091/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
+      `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
     );
     const response = await fetch(
-      `https://localhost:7091/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
+      `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UpdateOffersTransactionsDetails/${offerTransactionId}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -2562,7 +2566,7 @@ const GroceryPaymentmethod = () => {
           Limit: item.limit || 0,
         };
         const res = await fetch(
-          `https://localhost:7091/api/UploadGrocery/UpdateGroceryItems?id=${encodeURIComponent(item.id)}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/UpdateGroceryItems?id=${encodeURIComponent(item.id)}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -2720,7 +2724,7 @@ const GroceryPaymentmethod = () => {
       const mobileNumber =
         primaryAddress?.mobileNumber || primaryAddress?.mobileNumber;
       const response = await fetch(
-        `https://localhost:7091/api/Auth/sendLmartsms`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Auth/sendLmartsms`,
         {
           method: "POST",
           headers: {

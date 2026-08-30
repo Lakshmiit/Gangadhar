@@ -252,9 +252,10 @@ const collectionsCategories = [
   { label: "Kurta Sets", value: "Kurta Sets", image: kurti },
 ];
 
-const IMAGE_API = `https://localhost:7091/api/FileUpload/download?generatedfilename=`;
+const IMAGE_API = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=`;
 
-const VENDOR_ORDERS_API_BASE = "https://localhost:7091/api";
+const VENDOR_ORDERS_API_BASE =
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 const GET_VENDOR_ORDERS_URL = `${VENDOR_ORDERS_API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const VENDOR_ORDERS_POLL_INTERVAL_MS = 25000;
 
@@ -738,7 +739,7 @@ const ProfilePage = () => {
     (async () => {
       try {
         const res = await axios.get(
-          `https://localhost:7091/api/DeliveryPartner/GetDeliveryPartnerDetailsByUserId?userId=${userId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/DeliveryPartner/GetDeliveryPartnerDetailsByUserId?userId=${userId}`,
         );
         if (cancelled) return;
         const raw = res?.data ?? null;
@@ -770,7 +771,7 @@ const ProfilePage = () => {
     const pollDeliveryOrders = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/Mart/GetMartTicketsByUserId?userId=${userId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetMartTicketsByUserId?userId=${userId}`,
         );
         if (!response.ok || cancelled) return;
         const data = await response.json();
@@ -1102,7 +1103,7 @@ const ProfilePage = () => {
     try {
       setWalletLoading(true);
       const response = await fetch(
-        `https://localhost:7091/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
       );
       const data = await response.json();
       if (data && data.length > 0) {
@@ -1241,7 +1242,7 @@ const ProfilePage = () => {
     //       message: "User fetching grocery items in profile page"
     //     };
     //     await axios.post(
-    //       `https://localhost:7091/api/LmartLogs/UploadlogsDetails`,
+    //       `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LmartLogs/UploadlogsDetails`,
     //       payload
     //     );
     //   } catch (err) {
@@ -1549,7 +1550,7 @@ const ProfilePage = () => {
   //   const fetchDeliveryData = async () => {
   //     try {
   //       const response = await fetch(
-  //         `https://localhost:7091/api/Mart/GetProductDetails?id=${id}`
+  //         `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${id}`
   //       );
   //       if (!response.ok) {
   //         throw new Error("Failed to fetch grocery product data");
@@ -1625,7 +1626,7 @@ const ProfilePage = () => {
     try {
       setDeliveryTicketsLoading(true);
       const response = await fetch(
-        `https://localhost:7091/api/Mart/GetMartTicketsByUserId?userId=${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetMartTicketsByUserId?userId=${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch ticket data");
@@ -1668,7 +1669,7 @@ const ProfilePage = () => {
     clickLock.current = true;
     try {
       const res = await axios.get(
-        `https://localhost:7091/api/DeliveryPartner/GetDeliveryPartnerDetailsByUserId?userId=${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/DeliveryPartner/GetDeliveryPartnerDetailsByUserId?userId=${userId}`,
       );
       const raw = res?.data ?? null;
       const profile = Array.isArray(raw)
@@ -1724,7 +1725,7 @@ const ProfilePage = () => {
   const handleStatusUpdate = async (ticket, newStatus) => {
     try {
       const detailsResponse = await fetch(
-        `https://localhost:7091/api/Mart/GetProductDetails?id=${ticket.id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${ticket.id}`,
       );
 
       if (!detailsResponse.ok) {
@@ -1770,7 +1771,7 @@ const ProfilePage = () => {
       };
       console.log("FINAL PAYLOAD:", payload);
       const response = await fetch(
-        `https://localhost:7091/api/Mart/UpdateProductDetails/${ticket.id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${ticket.id}`,
         {
           method: "PUT",
           headers: {
@@ -1797,7 +1798,7 @@ const ProfilePage = () => {
   const handleUpdatePaymentMethod = async (ticket) => {
     try {
       const detailsResponse = await fetch(
-        `https://localhost:7091/api/Mart/GetProductDetails?id=${ticket.id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${ticket.id}`,
       );
 
       if (!detailsResponse.ok) {
@@ -1829,7 +1830,7 @@ const ProfilePage = () => {
       };
       console.log("FINAL PAYLOAD:", payload);
       const response = await fetch(
-        `https://localhost:7091/api/Mart/UpdateProductDetails/${ticket.id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${ticket.id}`,
         {
           method: "PUT",
           headers: {
@@ -2103,19 +2104,19 @@ const ProfilePage = () => {
           lakshmiResponse,
         ] = await Promise.all([
           fetch(
-            `https://localhost:7091/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=raiseTicket`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=raiseTicket`,
           ),
           fetch(
-            `https://localhost:7091/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=buyProduct`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=buyProduct`,
           ),
           fetch(
-            `https://localhost:7091/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=bookTechnician`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=bookTechnician`,
           ),
           fetch(
-            `https://localhost:7091/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=mart`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=mart`,
           ),
           fetch(
-            `https://localhost:7091/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=collections`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetAllTicketsList?userId=${userId}&type=collections`,
           ),
         ]);
         if (
@@ -2218,7 +2219,7 @@ const ProfilePage = () => {
       setTrackError("");
       setTrackedOrder(null);
       const response = await fetch(
-        `https://localhost:7091/api/Mart/GetProductDetails?id=${ticket.id}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${ticket.id}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch live order status");
@@ -2286,7 +2287,7 @@ const ProfilePage = () => {
       try {
         let apiUrl = "";
         if (userType === "customer") {
-          apiUrl = `https://localhost:7091/api/customer/customerProfileData?profileType=${userType}&UserId=${userId}`;
+          apiUrl = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/customer/customerProfileData?profileType=${userType}&UserId=${userId}`;
         }
         if (!apiUrl) return;
         const response = await axios.get(apiUrl);
@@ -2363,7 +2364,7 @@ const ProfilePage = () => {
     try {
       if (!photoId) return;
       const response = await axios.get(
-        `https://localhost:7091/api/FileUpload/download?generatedfilename=${photoId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photoId}`,
       );
       if (response.status === 200 && response.data.imageData) {
         const imageUrl = `data:image/jpeg;base64,${response.data.imageData}`;

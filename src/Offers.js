@@ -96,7 +96,7 @@ const OffersProductCard = () => {
     (async () => {
       try {
         const res = await fetch(
-          `https://localhost:7091/api/Product/GetAllProductList`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetAllProductList`,
         );
         const list = await res.json();
         if (canceled) return;
@@ -125,7 +125,7 @@ const OffersProductCard = () => {
         setSelectedCategory(decoded);
         setProducts([]);
         const { data } = await axios.get(
-          `https://localhost:7091/api/Product/GetProductsByCategory?Category=${encodeURIComponent(decoded)}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?Category=${encodeURIComponent(decoded)}`,
         );
         setProducts(Array.isArray(data) ? data : []);
       } catch {
@@ -191,7 +191,7 @@ const OffersProductCard = () => {
       limiterRef.current(async () => {
         try {
           const res = await fetch(
-            `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(first)}`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(first)}`,
           );
           const data = await res.json();
           const b64 = data?.imageData || "";
@@ -267,7 +267,7 @@ const OffersProductCard = () => {
       } else {
         try {
           const res = await fetch(
-            `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(first)}`,
+            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(first)}`,
           );
           const data = await res.json();
           if (data?.imageData) {
@@ -297,7 +297,7 @@ const OffersProductCard = () => {
               url = `data:image/jpeg;base64,${c}`;
             } else {
               const res = await fetch(
-                `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
+                `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
               );
               const data = await res.json();
               if (!data?.imageData) return;

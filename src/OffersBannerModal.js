@@ -42,7 +42,7 @@ const OffersBannerModal = () => {
     const fetchOffers = async () => {
       try {
         const res = await axios.get(
-          "https://localhost:7091/api/UpLoadBannners/GetBanners",
+          "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UpLoadBannners/GetBanners",
         );
         setOffersData(res.data);
       } catch (err) {

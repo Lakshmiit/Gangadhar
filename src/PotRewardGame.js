@@ -6,7 +6,8 @@ import { showToast } from "./toast";
 // API URLS
 // ======================================================
 
-const API_BASE = "https://localhost:7091/api";
+const API_BASE =
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 
 const GET_OFFER_TRANSACTION_URL = `${API_BASE}/OffersTransactions/GetOfferTransactionByUserId`;
 

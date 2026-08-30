@@ -20,7 +20,7 @@ import { Button } from "react-bootstrap";
 import Footer from "./Footer.js";
 import "./App.css";
 
-const API = "https://localhost:7091/api";
+const API = "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 
 const AdminPushNotifications = () => {
   const [isMobile, setIsMobile] = useState(false);

@@ -50,7 +50,7 @@ const PaymentConfirmation = () => {
     const fetchtechnicianData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/BookTechnician/GetBookTechnician/${raiseTicketId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnician/${raiseTicketId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch technician data");
@@ -151,7 +151,7 @@ const PaymentConfirmation = () => {
       let response;
       if (selectedPayment === "online") {
         response = await fetch(
-          `https://localhost:7091/api/BookTechnician/${raiseTicketId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/${raiseTicketId}`,
           {
             method: "PUT",
             headers: {
@@ -173,7 +173,7 @@ const PaymentConfirmation = () => {
         window.location.href = `/bookTechnicianOnlinePayment/${raiseTicketId}`;
       } else if (selectedPayment === "technician") {
         response = await fetch(
-          `https://localhost:7091/api/BookTechnician/${raiseTicketId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/${raiseTicketId}`,
           {
             method: "PUT",
             headers: {

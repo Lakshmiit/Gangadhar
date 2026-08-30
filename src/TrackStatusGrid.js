@@ -35,7 +35,7 @@
 //   }, [ticketData, states,districts,pinCodes,assigned]);
 //   useEffect(() => {
 //     setLoading(true);
-//     const url = `https://localhost:7091/api/RaiseTicket/GetTrackTicketsByCustomerId?customerId=${userId}`;
+//     const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetTrackTicketsByCustomerId?customerId=${userId}`;
 //     axios
 //       .get(url)
 //       .then((response) => {
@@ -83,7 +83,7 @@
 //   //   );
 //   //   if (confirmDelete) {
 //   //     axios
-//   //       .delete(`https://localhost:7091/api/RaiseTicket/${ticketId}`)
+//   //       .delete(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/${ticketId}`)
 //   //       .then(() => {
 //   //         setTicketData((prevData) =>
 //   //           prevData.filter((ticket) => ticket.id !== ticketId)

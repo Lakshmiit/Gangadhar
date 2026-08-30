@@ -29,17 +29,11 @@ const compressImageToBase64 = (file) => {
         let height = img.height;
 
         // Resize image while maintaining aspect ratio
-        if (
-          width > MAX_IMAGE_WIDTH ||
-          height > MAX_IMAGE_HEIGHT
-        ) {
+        if (width > MAX_IMAGE_WIDTH || height > MAX_IMAGE_HEIGHT) {
           const widthRatio = MAX_IMAGE_WIDTH / width;
           const heightRatio = MAX_IMAGE_HEIGHT / height;
 
-          const ratio = Math.min(
-            widthRatio,
-            heightRatio
-          );
+          const ratio = Math.min(widthRatio, heightRatio);
 
           width = Math.round(width * ratio);
           height = Math.round(height * ratio);
@@ -57,41 +51,26 @@ const compressImageToBase64 = (file) => {
           return;
         }
 
-        ctx.drawImage(
-          img,
-          0,
-          0,
-          width,
-          height
-        );
+        ctx.drawImage(img, 0, 0, width, height);
 
         // Convert to JPEG and compress
-        const compressedDataUrl =
-          canvas.toDataURL(
-            "image/jpeg",
-            IMAGE_QUALITY
-          );
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", IMAGE_QUALITY);
 
         // Remove data:image/jpeg;base64,
-        const base64 =
-          compressedDataUrl.split(",")[1];
+        const base64 = compressedDataUrl.split(",")[1];
 
         resolve(base64);
       };
 
       img.onerror = () => {
-        reject(
-          new Error("Could not load image.")
-        );
+        reject(new Error("Could not load image."));
       };
 
       img.src = event.target.result;
     };
 
     reader.onerror = () => {
-      reject(
-        new Error("Could not read image.")
-      );
+      reject(new Error("Could not read image."));
     };
 
     reader.readAsDataURL(file);
@@ -111,9 +90,7 @@ const DocumentUpload = ({
   inputRef,
 }) => (
   <div className="vr-upload">
-    <label className="vr-upload-label">
-      {label}
-    </label>
+    <label className="vr-upload-label">{label}</label>
 
     <input
       ref={inputRef}
@@ -124,12 +101,7 @@ const DocumentUpload = ({
     />
 
     {!file ? (
-      <div
-        className="vr-upload-box"
-        onClick={() =>
-          inputRef.current?.click()
-        }
-      >
+      <div className="vr-upload-box" onClick={() => inputRef.current?.click()}>
         <svg
           width="26"
           height="26"
@@ -151,21 +123,13 @@ const DocumentUpload = ({
           />
         </svg>
 
-        <span className="vr-upload-title">
-          Upload {label}
-        </span>
+        <span className="vr-upload-title">Upload {label}</span>
 
-        <span className="vr-upload-hint">
-          {hint}
-        </span>
+        <span className="vr-upload-hint">{hint}</span>
       </div>
     ) : (
       <div className="vr-upload-box vr-upload-filled">
-        <img
-          src={preview}
-          alt={label}
-          className="vr-upload-thumb"
-        />
+        <img src={preview} alt={label} className="vr-upload-thumb" />
 
         <div className="vr-upload-meta">
           <span className="vr-upload-check">
@@ -183,21 +147,16 @@ const DocumentUpload = ({
                 strokeLinejoin="round"
               />
             </svg>
-
             Attached
           </span>
 
-          <span className="vr-upload-filename">
-            {file.name}
-          </span>
+          <span className="vr-upload-filename">{file.name}</span>
 
           <div className="vr-upload-actions">
             <button
               type="button"
               className="vr-link"
-              onClick={() =>
-                inputRef.current?.click()
-              }
+              onClick={() => inputRef.current?.click()}
             >
               Replace
             </button>
@@ -241,71 +200,52 @@ const VendorRegisterPage = () => {
   const [userId, setUserId] = useState("");
 
   // Actual selected files
-  const [aadharFile, setAadharFile] =
-    useState(null);
+  const [aadharFile, setAadharFile] = useState(null);
 
-  const [aadharPreview, setAadharPreview] =
-    useState(null);
+  const [aadharPreview, setAadharPreview] = useState(null);
 
-  const [gstFile, setGstFile] =
-    useState(null);
+  const [gstFile, setGstFile] = useState(null);
 
-  const [gstPreview, setGstPreview] =
-    useState(null);
+  const [gstPreview, setGstPreview] = useState(null);
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [showConfirm, setShowConfirm] =
-    useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
-  const aadharInputRef =
-    useRef(null);
+  const aadharInputRef = useRef(null);
 
-  const gstInputRef =
-    useRef(null);
+  const gstInputRef = useRef(null);
 
-  const [stateList, setStateList] =
-    useState([]);
+  const [stateList, setStateList] = useState([]);
 
-  const [districtList, setDistrictList] =
-    useState([]);
+  const [districtList, setDistrictList] = useState([]);
 
-  const [statesLoading, setStatesLoading] =
-    useState(false);
+  const [statesLoading, setStatesLoading] = useState(false);
 
-  const [districtsLoading, setDistrictsLoading] =
-    useState(false);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
 
-  const [pincodeList, setPincodeList] =
-    useState([]);
+  const [pincodeList, setPincodeList] = useState([]);
 
-  const [pincodesLoading, setPincodesLoading] =
-    useState(false);
+  const [pincodesLoading, setPincodesLoading] = useState(false);
 
   // ============================================================
   // Load saved mobile number
   // ============================================================
   useEffect(() => {
-    const savedMobileNumber =
-      localStorage.getItem(
-        "vendorRegistrationMobileNumber"
-      );
+    const savedMobileNumber = localStorage.getItem(
+      "vendorRegistrationMobileNumber",
+    );
 
     if (savedMobileNumber) {
       setFormData((prev) => ({
         ...prev,
-        mobileNumber:
-          savedMobileNumber,
+        mobileNumber: savedMobileNumber,
       }));
     }
   }, []);
@@ -314,18 +254,12 @@ const VendorRegisterPage = () => {
   // Load saved user ID
   // ============================================================
   useEffect(() => {
-    const savedUserId =
-      localStorage.getItem(
-        "vendorRegistrationUserId"
-      );
+    const savedUserId = localStorage.getItem("vendorRegistrationUserId");
 
     if (savedUserId) {
       setUserId(savedUserId);
 
-      console.log(
-        "Vendor registration userId loaded:",
-        savedUserId
-      );
+      console.log("Vendor registration userId loaded:", savedUserId);
     }
   }, []);
 
@@ -337,20 +271,15 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        "https://localhost:7091/api/MasterData/getStates"
+        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates",
       )
       .then((response) => {
         setStateList(response.data);
       })
       .catch((error) => {
-        console.error(
-          "Error fetching states:",
-          error
-        );
+        console.error("Error fetching states:", error);
 
-        setError(
-          "Could not load states. Please refresh and try again."
-        );
+        setError("Could not load states. Please refresh and try again.");
       })
       .finally(() => {
         setStatesLoading(false);
@@ -371,20 +300,15 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        `https://localhost:7091/api/MasterData/getDistricts/${formData.stateId}`
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${formData.stateId}`,
       )
       .then((response) => {
         setDistrictList(response.data);
       })
       .catch((error) => {
-        console.error(
-          "Error fetching districts:",
-          error
-        );
+        console.error("Error fetching districts:", error);
 
-        setError(
-          "Could not load districts. Please try again."
-        );
+        setError("Could not load districts. Please try again.");
 
         setDistrictList([]);
       })
@@ -408,20 +332,15 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        `https://localhost:7091/api/MasterData/getPincodes/${formData.districtId}`
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getPincodes/${formData.districtId}`,
       )
       .then((response) => {
         setPincodeList(response.data);
       })
       .catch((error) => {
-        console.error(
-          "Error fetching pincodes:",
-          error
-        );
+        console.error("Error fetching pincodes:", error);
 
-        setError(
-          "Could not load pincodes. Please try again."
-        );
+        setError("Could not load pincodes. Please try again.");
 
         setPincodeList([]);
       })
@@ -444,24 +363,18 @@ const VendorRegisterPage = () => {
   // State Change
   // ============================================================
   const handleStateChange = (e) => {
-    const selectedStateId =
-      String(e.target.value);
+    const selectedStateId = String(e.target.value);
 
-    const selectedState =
-      stateList.find(
-        (s) =>
-          String(s.StateId) ===
-          selectedStateId
-      );
+    const selectedState = stateList.find(
+      (s) => String(s.StateId) === selectedStateId,
+    );
 
     setFormData((prev) => ({
       ...prev,
 
       stateId: selectedStateId,
 
-      state: selectedState
-        ? selectedState.StateName
-        : "",
+      state: selectedState ? selectedState.StateName : "",
 
       // Reset district
       districtId: "",
@@ -479,25 +392,18 @@ const VendorRegisterPage = () => {
   // District Change
   // ============================================================
   const handleDistrictChange = (e) => {
-    const selectedDistrictId =
-      String(e.target.value);
+    const selectedDistrictId = String(e.target.value);
 
-    const selectedDistrict =
-      districtList.find(
-        (d) =>
-          String(d.districtId) ===
-          selectedDistrictId
-      );
+    const selectedDistrict = districtList.find(
+      (d) => String(d.districtId) === selectedDistrictId,
+    );
 
     setFormData((prev) => ({
       ...prev,
 
-      districtId:
-        selectedDistrictId,
+      districtId: selectedDistrictId,
 
-      district: selectedDistrict
-        ? selectedDistrict.districtName
-        : "",
+      district: selectedDistrict ? selectedDistrict.districtName : "",
 
       // Reset pincode
       zipCode: "",
@@ -510,13 +416,11 @@ const VendorRegisterPage = () => {
   // Pincode Radio Change
   // ============================================================
   const handlePincodeChange = (e) => {
-    const selectedPincode =
-      String(e.target.value);
+    const selectedPincode = String(e.target.value);
 
     setFormData((prev) => ({
       ...prev,
-      zipCode:
-        selectedPincode,
+      zipCode: selectedPincode,
     }));
   };
 
@@ -526,8 +430,7 @@ const VendorRegisterPage = () => {
   const handleFileSelect = (e, kind) => {
     setError("");
 
-    const file =
-      e.target.files?.[0];
+    const file = e.target.files?.[0];
 
     if (!file) {
       return;
@@ -535,56 +438,40 @@ const VendorRegisterPage = () => {
 
     // Check image
     if (!file.type.startsWith("image/")) {
-      setError(
-        "Only image files (JPG, PNG, etc.) are accepted for documents."
-      );
+      setError("Only image files (JPG, PNG, etc.) are accepted for documents.");
 
       e.target.value = "";
       return;
     }
 
     // Check original file size
-    if (
-      file.size >
-      MAX_FILE_SIZE_MB *
-        1024 *
-        1024
-    ) {
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       setError(
-        `File is too large. Please upload an image under ${MAX_FILE_SIZE_MB}MB.`
+        `File is too large. Please upload an image under ${MAX_FILE_SIZE_MB}MB.`,
       );
 
       e.target.value = "";
       return;
     }
 
-    const previewUrl =
-      URL.createObjectURL(file);
+    const previewUrl = URL.createObjectURL(file);
 
     if (kind === "aadhar") {
       if (aadharPreview) {
-        URL.revokeObjectURL(
-          aadharPreview
-        );
+        URL.revokeObjectURL(aadharPreview);
       }
 
       setAadharFile(file);
-      setAadharPreview(
-        previewUrl
-      );
+      setAadharPreview(previewUrl);
     }
 
     if (kind === "gst") {
       if (gstPreview) {
-        URL.revokeObjectURL(
-          gstPreview
-        );
+        URL.revokeObjectURL(gstPreview);
       }
 
       setGstFile(file);
-      setGstPreview(
-        previewUrl
-      );
+      setGstPreview(previewUrl);
     }
   };
 
@@ -594,33 +481,27 @@ const VendorRegisterPage = () => {
   const removeFile = (kind) => {
     if (kind === "aadhar") {
       if (aadharPreview) {
-        URL.revokeObjectURL(
-          aadharPreview
-        );
+        URL.revokeObjectURL(aadharPreview);
       }
 
       setAadharFile(null);
       setAadharPreview(null);
 
       if (aadharInputRef.current) {
-        aadharInputRef.current.value =
-          "";
+        aadharInputRef.current.value = "";
       }
     }
 
     if (kind === "gst") {
       if (gstPreview) {
-        URL.revokeObjectURL(
-          gstPreview
-        );
+        URL.revokeObjectURL(gstPreview);
       }
 
       setGstFile(null);
       setGstPreview(null);
 
       if (gstInputRef.current) {
-        gstInputRef.current.value =
-          "";
+        gstInputRef.current.value = "";
       }
     }
   };
@@ -664,9 +545,7 @@ const VendorRegisterPage = () => {
       !districtId ||
       !zipCode.trim()
     ) {
-      setError(
-        "Please fill in all required fields."
-      );
+      setError("Please fill in all required fields.");
 
       return;
     }
@@ -674,12 +553,8 @@ const VendorRegisterPage = () => {
     // ----------------------------------------------------------
     // Password validation
     // ----------------------------------------------------------
-    if (
-      password !== confirmPassword
-    ) {
-      setError(
-        "Passwords do not match."
-      );
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
 
       return;
     }
@@ -687,14 +562,8 @@ const VendorRegisterPage = () => {
     // ----------------------------------------------------------
     // Pincode validation
     // ----------------------------------------------------------
-    if (
-      !ZIP_CODE_REGEX.test(
-        zipCode.trim()
-      )
-    ) {
-      setError(
-        "Please select a valid 6-digit PIN code."
-      );
+    if (!ZIP_CODE_REGEX.test(zipCode.trim())) {
+      setError("Please select a valid 6-digit PIN code.");
 
       return;
     }
@@ -703,9 +572,7 @@ const VendorRegisterPage = () => {
     // Aadhar validation
     // ----------------------------------------------------------
     if (!aadharFile) {
-      setError(
-        "Please upload your Aadhar card image."
-      );
+      setError("Please upload your Aadhar card image.");
 
       return;
     }
@@ -714,9 +581,7 @@ const VendorRegisterPage = () => {
     // GST validation
     // ----------------------------------------------------------
     if (!gstFile) {
-      setError(
-        "Please upload your GST certificate image."
-      );
+      setError("Please upload your GST certificate image.");
 
       return;
     }
@@ -727,31 +592,18 @@ const VendorRegisterPage = () => {
       // --------------------------------------------------------
       // Compress images BEFORE Base64 conversion
       // --------------------------------------------------------
-      console.log(
-        "Compressing Aadhar image..."
-      );
+      console.log("Compressing Aadhar image...");
 
-      const aadharBase64 =
-        await compressImageToBase64(
-          aadharFile
-        );
+      const aadharBase64 = await compressImageToBase64(aadharFile);
 
-      console.log(
-        "Compressing GST image..."
-      );
+      console.log("Compressing GST image...");
 
-      const gstBase64 =
-        await compressImageToBase64(
-          gstFile
-        );
+      const gstBase64 = await compressImageToBase64(gstFile);
 
       // --------------------------------------------------------
       // Get saved user ID
       // --------------------------------------------------------
-      const savedUserId =
-        localStorage.getItem(
-          "vendorRegistrationUserId"
-        );
+      const savedUserId = localStorage.getItem("vendorRegistrationUserId");
 
       // --------------------------------------------------------
       // Create existing JSON payload
@@ -759,58 +611,42 @@ const VendorRegisterPage = () => {
       const payload = {
         id: "string",
 
-        date:
-          new Date().toISOString(),
+        date: new Date().toISOString(),
 
-        vendorId:
-          savedUserId || "",
+        vendorId: savedUserId || "",
 
-        fullName:
-          fullName.trim(),
+        fullName: fullName.trim(),
 
-        Address:
-          address.trim(),
+        Address: address.trim(),
 
-        storeName:
-          storeName.trim(),
+        storeName: storeName.trim(),
 
-        registrationCertificate:
-          "",
+        registrationCertificate: "",
 
-        gst:
-          gstBase64,
+        gst: gstBase64,
 
-        aadharCard:
-          aadharBase64,
+        aadharCard: aadharBase64,
 
-        mobileNumber:
-          mobileNumber.trim(),
+        mobileNumber: mobileNumber.trim(),
 
-        UserName:
-          userName.trim(),
+        UserName: userName.trim(),
 
-        Password:
-          password.trim(),
+        Password: password.trim(),
 
-        state:
-          state,
+        state: state,
 
         // IMPORTANT:
         // State ID as string
-        stateId:
-          String(stateId),
+        stateId: String(stateId),
 
-        district:
-          district,
+        district: district,
 
         // IMPORTANT:
         // District ID as string
-        districtId:
-          String(districtId),
+        districtId: String(districtId),
 
         // Backend property is zipcode
-        zipcode:
-          zipCode.trim(),
+        zipcode: zipCode.trim(),
       };
 
       // --------------------------------------------------------
@@ -818,98 +654,61 @@ const VendorRegisterPage = () => {
       // --------------------------------------------------------
       console.log(
         "Original Aadhar:",
-        (
-          aadharFile.size /
-          1024
-        ).toFixed(2),
-        "KB"
+        (aadharFile.size / 1024).toFixed(2),
+        "KB",
       );
 
       console.log(
         "Compressed Aadhar Base64:",
-        (
-          aadharBase64.length /
-          1024
-        ).toFixed(2),
-        "KB"
+        (aadharBase64.length / 1024).toFixed(2),
+        "KB",
       );
 
-      console.log(
-        "Original GST:",
-        (
-          gstFile.size /
-          1024
-        ).toFixed(2),
-        "KB"
-      );
+      console.log("Original GST:", (gstFile.size / 1024).toFixed(2), "KB");
 
       console.log(
         "Compressed GST Base64:",
-        (
-          gstBase64.length /
-          1024
-        ).toFixed(2),
-        "KB"
+        (gstBase64.length / 1024).toFixed(2),
+        "KB",
       );
 
       // --------------------------------------------------------
       // Send JSON to existing backend
       // --------------------------------------------------------
-      const response =
-        await fetch(
-          "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
-          {
-            method: "POST",
+      const response = await fetch(
+        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
+        {
+          method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-            body:
-              JSON.stringify(
-                payload
-              ),
-          }
-        );
+          body: JSON.stringify(payload),
+        },
+      );
 
       // --------------------------------------------------------
       // Handle API error
       // --------------------------------------------------------
       if (!response.ok) {
-        const text =
-          await response
-            .text()
-            .catch(() => "");
+        const text = await response.text().catch(() => "");
 
-        throw new Error(
-          text ||
-            "Registration failed. Please try again."
-        );
+        throw new Error(text || "Registration failed. Please try again.");
       }
 
       // --------------------------------------------------------
       // Success
       // --------------------------------------------------------
-      setMessage(
-        "Registration successful. Redirecting to login..."
-      );
+      setMessage("Registration successful. Redirecting to login...");
 
       setTimeout(() => {
-        navigate(
-          "/vendor/login"
-        );
+        navigate("/vendor/login");
       }, 1200);
     } catch (err) {
-      console.error(
-        "Vendor registration error:",
-        err
-      );
+      console.error("Vendor registration error:", err);
 
-      setError(
-        err.message ||
-          "Unable to register vendor. Please try again."
-      );
+      setError(err.message || "Unable to register vendor. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -922,56 +721,34 @@ const VendorRegisterPage = () => {
     <div className="vr-page">
       <div className="vr-form-wrap">
         <div className="vr-card">
-
           {/* Header */}
           <div className="vr-header">
             <ArrowBackIcon
               className="vr-back-icon"
-              onClick={() =>
-                navigate(
-                  `/profilePage/customer/${userId}`
-                )
-              }
+              onClick={() => navigate(`/profilePage/customer/${userId}`)}
             />
 
-            <h3 className="vr-card-title">
-              Vendor Registration
-            </h3>
+            <h3 className="vr-card-title">Vendor Registration</h3>
           </div>
 
           {/* Error */}
-          {error && (
-            <div className="vr-alert vr-alert-error">
-              {error}
-            </div>
-          )}
+          {error && <div className="vr-alert vr-alert-error">{error}</div>}
 
           {/* Success */}
           {message && (
-            <div className="vr-alert vr-alert-success">
-              {message}
-            </div>
+            <div className="vr-alert vr-alert-success">{message}</div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-          >
-
+          <form onSubmit={handleSubmit}>
             {/* Full Name */}
             <div className="vr-field">
-              <label className="vr-label">
-                Full Name
-              </label>
+              <label className="vr-label">Full Name</label>
 
               <input
                 type="text"
                 className="vr-input"
-                value={
-                  formData.fullName
-                }
-                onChange={handleChange(
-                  "fullName"
-                )}
+                value={formData.fullName}
+                onChange={handleChange("fullName")}
                 placeholder="Contact person's full name"
                 required
               />
@@ -979,19 +756,13 @@ const VendorRegisterPage = () => {
 
             {/* Store Name */}
             <div className="vr-field">
-              <label className="vr-label">
-                Business / Vendor Name
-              </label>
+              <label className="vr-label">Business / Vendor Name</label>
 
               <input
                 type="text"
                 className="vr-input"
-                value={
-                  formData.storeName
-                }
-                onChange={handleChange(
-                  "storeName"
-                )}
+                value={formData.storeName}
+                onChange={handleChange("storeName")}
                 placeholder="Store or business name"
                 required
               />
@@ -999,18 +770,12 @@ const VendorRegisterPage = () => {
 
             {/* Address */}
             <div className="vr-field">
-              <label className="vr-label">
-                Address
-              </label>
+              <label className="vr-label">Address</label>
 
               <textarea
                 className="vr-textarea"
-                value={
-                  formData.address
-                }
-                onChange={handleChange(
-                  "address"
-                )}
+                value={formData.address}
+                onChange={handleChange("address")}
                 placeholder="Business address"
                 required
               />
@@ -1018,109 +783,62 @@ const VendorRegisterPage = () => {
 
             {/* State / District */}
             <div className="vr-row">
-
               {/* State */}
               <div className="vr-field">
-                <label className="vr-label">
-                  State
-                </label>
+                <label className="vr-label">State</label>
 
                 <select
                   className="vr-input"
-                  value={
-                    formData.stateId
-                  }
-                  onChange={
-                    handleStateChange
-                  }
+                  value={formData.stateId}
+                  onChange={handleStateChange}
                   required
-                  disabled={
-                    statesLoading
-                  }
+                  disabled={statesLoading}
                 >
                   <option value="">
-                    {statesLoading
-                      ? "Loading states..."
-                      : "Select state"}
+                    {statesLoading ? "Loading states..." : "Select state"}
                   </option>
 
-                  {stateList.map(
-                    (s) => (
-                      <option
-                        key={
-                          s.StateId
-                        }
-                        value={String(
-                          s.StateId
-                        )}
-                      >
-                        {
-                          s.StateName
-                        }
-                      </option>
-                    )
-                  )}
+                  {stateList.map((s) => (
+                    <option key={s.StateId} value={String(s.StateId)}>
+                      {s.StateName}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* District */}
               <div className="vr-field">
-                <label className="vr-label">
-                  District
-                </label>
+                <label className="vr-label">District</label>
 
                 <select
                   className="vr-input"
-                  value={
-                    formData.districtId
-                  }
-                  onChange={
-                    handleDistrictChange
-                  }
+                  value={formData.districtId}
+                  onChange={handleDistrictChange}
                   required
-                  disabled={
-                    !formData.stateId ||
-                    districtsLoading
-                  }
+                  disabled={!formData.stateId || districtsLoading}
                 >
                   <option value="">
                     {!formData.stateId
                       ? "Select state first"
                       : districtsLoading
-                      ? "Loading districts..."
-                      : "Select district"}
+                        ? "Loading districts..."
+                        : "Select district"}
                   </option>
 
-                  {districtList.map(
-                    (d) => (
-                      <option
-                        key={
-                          d.districtId
-                        }
-                        value={String(
-                          d.districtId
-                        )}
-                      >
-                        {
-                          d.districtName
-                        }
-                      </option>
-                    )
-                  )}
+                  {districtList.map((d) => (
+                    <option key={d.districtId} value={String(d.districtId)}>
+                      {d.districtName}
+                    </option>
+                  ))}
                 </select>
               </div>
-
             </div>
 
             {/* Pincode / Mobile */}
             <div className="vr-row">
-
               {/* Pincode */}
               <div className="vr-field">
-
-                <label className="vr-label">
-                  ZipCode / PIN Code
-                </label>
+                <label className="vr-label">ZipCode / PIN Code</label>
 
                 {!formData.stateId ? (
                   <div className="vr-radio-message">
@@ -1131,153 +849,95 @@ const VendorRegisterPage = () => {
                     Please select a district first
                   </div>
                 ) : pincodesLoading ? (
-                  <div className="vr-radio-message">
-                    Loading pincodes...
-                  </div>
-                ) : pincodeList.length ===
-                  0 ? (
+                  <div className="vr-radio-message">Loading pincodes...</div>
+                ) : pincodeList.length === 0 ? (
                   <div className="vr-radio-message">
                     No pincodes available for this district
                   </div>
                 ) : (
                   <div className="vr-pincode-list">
+                    {pincodeList.map((pincode, index) => {
+                      const pincodeValue =
+                        typeof pincode === "string"
+                          ? pincode
+                          : String(
+                              pincode.pincode ??
+                                pincode.Pincode ??
+                                pincode.pinCode ??
+                                pincode.PinCode ??
+                                "",
+                            );
 
-                    {pincodeList.map(
-                      (
-                        pincode,
-                        index
-                      ) => {
-
-                        const pincodeValue =
-                          typeof pincode ===
-                          "string"
-                            ? pincode
-                            : String(
-                                pincode.pincode ??
-                                  pincode.Pincode ??
-                                  pincode.pinCode ??
-                                  pincode.PinCode ??
-                                  ""
-                              );
-
-                        if (
-                          !pincodeValue
-                        ) {
-                          return null;
-                        }
-
-                        return (
-                          <label
-                            key={`${pincodeValue}-${index}`}
-                            className="vr-pincode-option"
-                          >
-
-                            <input
-                              type="radio"
-                              name="vendorPincode"
-                              value={
-                                pincodeValue
-                              }
-                              checked={
-                                formData.zipCode ===
-                                pincodeValue
-                              }
-                              onChange={
-                                handlePincodeChange
-                              }
-                              required
-                            />
-
-                            <span>
-                              {
-                                pincodeValue
-                              }
-                            </span>
-
-                          </label>
-                        );
+                      if (!pincodeValue) {
+                        return null;
                       }
-                    )}
 
+                      return (
+                        <label
+                          key={`${pincodeValue}-${index}`}
+                          className="vr-pincode-option"
+                        >
+                          <input
+                            type="radio"
+                            name="vendorPincode"
+                            value={pincodeValue}
+                            checked={formData.zipCode === pincodeValue}
+                            onChange={handlePincodeChange}
+                            required
+                          />
+
+                          <span>{pincodeValue}</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
-
               </div>
 
               {/* Mobile */}
               <div className="vr-field">
-
-                <label className="vr-label">
-                  Mobile Number
-                </label>
+                <label className="vr-label">Mobile Number</label>
 
                 <input
                   type="tel"
                   className="vr-input"
-                  value={
-                    formData.mobileNumber
-                  }
+                  value={formData.mobileNumber}
                   placeholder="10-digit mobile number"
                   readOnly
                   required
                 />
-
               </div>
-
             </div>
 
             {/* Username */}
             <div className="vr-row">
-
               <div className="vr-field">
-
-                <label className="vr-label">
-                  Username
-                </label>
+                <label className="vr-label">Username</label>
 
                 <input
                   type="text"
                   className="vr-input"
-                  value={
-                    formData.userName
-                  }
-                  onChange={handleChange(
-                    "userName"
-                  )}
+                  value={formData.userName}
+                  onChange={handleChange("userName")}
                   placeholder="Choose a username"
                   required
                 />
-
               </div>
 
               <div className="vr-field" />
-
             </div>
 
             {/* Password */}
             <div className="vr-row">
-
               <div className="vr-field">
-
-                <label className="vr-label">
-                  Password
-                </label>
+                <label className="vr-label">Password</label>
 
                 <div className="vr-password-wrap">
-
                   <input
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showPassword ? "text" : "password"}
                     className="vr-input"
-                    value={
-                      formData.password
-                    }
-                    onChange={handleChange(
-                      "password"
-                    )}
+                    value={formData.password}
+                    onChange={handleChange("password")}
                     placeholder="Create password"
                     required
                     style={{
@@ -1288,46 +948,24 @@ const VendorRegisterPage = () => {
                   <button
                     type="button"
                     className="vr-eye-btn"
-                    onClick={() =>
-                      setShowPassword(
-                        (s) => !s
-                      )
-                    }
+                    onClick={() => setShowPassword((s) => !s)}
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <VisibilityIcon />
-                    ) : (
-                      <VisibilityOffIcon />
-                    )}
+                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                   </button>
-
                 </div>
-
               </div>
 
               {/* Confirm Password */}
               <div className="vr-field">
-
-                <label className="vr-label">
-                  Confirm Password
-                </label>
+                <label className="vr-label">Confirm Password</label>
 
                 <div className="vr-password-wrap">
-
                   <input
-                    type={
-                      showConfirm
-                        ? "text"
-                        : "password"
-                    }
+                    type={showConfirm ? "text" : "password"}
                     className="vr-input"
-                    value={
-                      formData.confirmPassword
-                    }
-                    onChange={handleChange(
-                      "confirmPassword"
-                    )}
+                    value={formData.confirmPassword}
+                    onChange={handleChange("confirmPassword")}
                     placeholder="Repeat password"
                     required
                     style={{
@@ -1338,106 +976,50 @@ const VendorRegisterPage = () => {
                   <button
                     type="button"
                     className="vr-eye-btn"
-                    onClick={() =>
-                      setShowConfirm(
-                        (s) => !s
-                      )
-                    }
+                    onClick={() => setShowConfirm((s) => !s)}
                     tabIndex={-1}
                   >
-                    {showConfirm ? (
-                      <VisibilityIcon />
-                    ) : (
-                      <VisibilityOffIcon />
-                    )}
+                    {showConfirm ? <VisibilityIcon /> : <VisibilityOffIcon />}
                   </button>
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Document Uploads */}
             <div className="vr-uploads">
-
               <DocumentUpload
                 label="Aadhar Card"
                 hint="One image, up to 5MB"
-                file={
-                  aadharFile
-                }
-                preview={
-                  aadharPreview
-                }
-                onChange={(e) =>
-                  handleFileSelect(
-                    e,
-                    "aadhar"
-                  )
-                }
-                onRemove={() =>
-                  removeFile(
-                    "aadhar"
-                  )
-                }
-                inputRef={
-                  aadharInputRef
-                }
+                file={aadharFile}
+                preview={aadharPreview}
+                onChange={(e) => handleFileSelect(e, "aadhar")}
+                onRemove={() => removeFile("aadhar")}
+                inputRef={aadharInputRef}
               />
 
               <DocumentUpload
                 label="GST Certificate"
                 hint="One image, up to 5MB"
-                file={
-                  gstFile
-                }
-                preview={
-                  gstPreview
-                }
-                onChange={(e) =>
-                  handleFileSelect(
-                    e,
-                    "gst"
-                  )
-                }
-                onRemove={() =>
-                  removeFile(
-                    "gst"
-                  )
-                }
-                inputRef={
-                  gstInputRef
-                }
+                file={gstFile}
+                preview={gstPreview}
+                onChange={(e) => handleFileSelect(e, "gst")}
+                onRemove={() => removeFile("gst")}
+                inputRef={gstInputRef}
               />
-
             </div>
 
             {/* Register Button */}
-            <button
-              type="submit"
-              className="vr-submit"
-              disabled={loading}
-            >
-              {loading && (
-                <span className="vr-spinner" />
-              )}
+            <button type="submit" className="vr-submit" disabled={loading}>
+              {loading && <span className="vr-spinner" />}
 
-              {loading
-                ? "Submitting..."
-                : "Register"}
+              {loading ? "Submitting..." : "Register"}
             </button>
-
           </form>
 
           {/* Footer */}
           <div className="vr-footer">
-            Already registered?{" "}
-            <a href="/vendor/login">
-              Login here
-            </a>
+            Already registered? <a href="/vendor/login">Login here</a>
           </div>
-
         </div>
       </div>
     </div>

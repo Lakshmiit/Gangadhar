@@ -23,7 +23,7 @@
 
 // const fetchOrderDetails = useCallback(async () => {
 //   try {
-//       const res = await fetch(`https://localhost:7091/api/LakshmiCollection/GetLakshmiCollectionDetails/${id}`);
+//       const res = await fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${id}`);
 //       const data = await res.json();
 //       setOrderBooking(data);
 //       setTotalAmount(data.grandTotal);

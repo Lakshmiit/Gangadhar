@@ -28,7 +28,7 @@ const AdminGroceryList = () => {
     (async () => {
       setLoading(true);
       try {
-        const url = `https://localhost:7091/api/UploadGrocery/GetAllGroceryItemsForAdmin`;
+        const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetAllGroceryItemsForAdmin`;
         const { data } = await axios.get(url);
         const groceries = (Array.isArray(data) ? data : []).map((g) => ({
           ...g,
@@ -69,7 +69,7 @@ const AdminGroceryList = () => {
       return;
     try {
       await axios.delete(
-        `https://localhost:7091/api/UploadGrocery?id=${groceryId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery?id=${groceryId}`,
       );
       const prune = (arr) => arr.filter((g) => g.id !== groceryId);
       setFinalGroceries((prev) => prune(prev));

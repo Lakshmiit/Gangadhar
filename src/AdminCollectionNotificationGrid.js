@@ -27,7 +27,7 @@ const AdminCollectionNotificationGrid = () => {
 
   useEffect(() => {
     setLoading(true);
-    const url = `https://localhost:7091/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`;
+    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`;
     axios
       .get(url)
       .then((response) => {
@@ -70,7 +70,9 @@ const AdminCollectionNotificationGrid = () => {
     );
     if (confirmDelete) {
       axios
-        .delete(`https://localhost:7091/api/RaiseTicket/${collectionId}`)
+        .delete(
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/${collectionId}`,
+        )
         .then(() => {
           setCollectionData((prevData) =>
             prevData.filter((collection) => collection.id !== collectionId),

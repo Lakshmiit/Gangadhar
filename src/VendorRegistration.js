@@ -252,7 +252,7 @@ export default function MartRegistration() {
       };
 
       const response = await fetch(
-        "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
+        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1148,7 +1148,7 @@ function UploadBlock({
 //   //     };
 
 //   //     const response = await fetch(
-//   //       "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
+//   //       "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
 //   //       {
 //   //         method: "POST",
 //   //         headers: {
@@ -1200,7 +1200,7 @@ function UploadBlock({
 //       };
 
 //       const response = await fetch(
-//         "https://localhost:7091/api/VendorRegistration/UploadVendorDetails",
+//         "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
 //         {
 //           method: "POST",
 //           headers: {

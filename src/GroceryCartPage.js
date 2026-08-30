@@ -124,7 +124,7 @@ const GroceryCartPage = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Address/GetAddressById/${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -190,7 +190,7 @@ const GroceryCartPage = () => {
     (async () => {
       try {
         const res = await fetch(
-          `https://localhost:7091/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
             selectedVendorId,
           )}`,
           { signal: controller.signal },
@@ -266,7 +266,7 @@ const GroceryCartPage = () => {
   //       const results = await Promise.allSettled(
   //         uniqueNames.map(async (name) => {
   //           const res = await fetch(
-  //             `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+  //             `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
   //               name,
   //             )}`,
   //           );
@@ -457,7 +457,7 @@ const GroceryCartPage = () => {
   const fetchLatestStockForHandyman = useCallback(async (productName) => {
     try {
       const res = await fetch(
-        `https://localhost:7091/api/Product/GetProductsByProductName?productName=${encodeURIComponent(productName)}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByProductName?productName=${encodeURIComponent(productName)}`,
       );
       if (!res.ok) return Infinity;
       const data = await res.json();
@@ -489,7 +489,7 @@ const GroceryCartPage = () => {
       }
       try {
         const res = await fetch(
-          `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(productName)}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(productName)}`,
         );
         if (!res.ok) return Infinity;
         const data = await res.json();
@@ -848,7 +848,7 @@ const GroceryCartPage = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/Mart/UploadProductDetails`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UploadProductDetails`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -895,7 +895,7 @@ const GroceryCartPage = () => {
 
       // // Step 1: Verify Guest User
       // const guestResponse = await fetch(
-      //   `https://localhost:7091/api/Customer/GuestUserExistingVerification/${mobileNumber}`,
+      //   `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/GuestUserExistingVerification/${mobileNumber}`,
       // );
       // if (!guestResponse.ok) return;
       // const guestData = await guestResponse.json();
@@ -906,7 +906,7 @@ const GroceryCartPage = () => {
 
       // Step 2: Check if wallet transaction already exists
       const offerResponse = await fetch(
-        `https://localhost:7091/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/GetOfferTransactionByUserId?userId=${userId}`,
       );
 
       if (offerResponse.ok) {
@@ -932,7 +932,7 @@ const GroceryCartPage = () => {
       };
 
       const createResponse = await fetch(
-        "https://localhost:7091/api/OffersTransactions/UploadOffersTransactionsDetails",
+        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/OffersTransactions/UploadOffersTransactionsDetails",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

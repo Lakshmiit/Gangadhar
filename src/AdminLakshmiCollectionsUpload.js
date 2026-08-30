@@ -149,7 +149,8 @@ const AdminLakshmiCollectionsUpload = () => {
       formData.append("fileName", fileName);
 
       const response = await fetch(
-        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
+          fileName,
         {
           method: "POST",
           headers: {
@@ -202,7 +203,7 @@ const AdminLakshmiCollectionsUpload = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/UploadLakshmiCollection/UploadLakshmiCollection`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UploadLakshmiCollection`,
         {
           method: "POST",
           headers: {

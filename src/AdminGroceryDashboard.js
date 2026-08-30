@@ -309,16 +309,20 @@ const Notification = () => {
         groceryItemResponse,
         collectionsResponse,
       ] = await Promise.all([
-        fetch(`https://localhost:7091/api/RaiseTicket/GetTicketsNotifications`),
         fetch(
-          `https://localhost:7091/api/BookTechnician/GetBookTechnicianForAdminList`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetTicketsNotifications`,
         ),
         fetch(
-          `https://localhost:7091/api/BuyProduct/GetBuyProductDetailsForAdminList`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnicianForAdminList`,
         ),
-        fetch(`https://localhost:7091/api/Mart/GetAllMartItems`),
         fetch(
-          `https://localhost:7091/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsForAdminList`,
+        ),
+        fetch(
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetAllMartItems`,
+        ),
+        fetch(
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`,
         ),
       ]);
 

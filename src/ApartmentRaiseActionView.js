@@ -66,7 +66,7 @@ const ApartmentRaiseActionView = () => {
     const fetchapartmentData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/ApartmentRaiseTicket/GetApartmentMaintenanceRaiseTicket/${apartmentRaiseTicketId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ApartmentRaiseTicket/GetApartmentMaintenanceRaiseTicket/${apartmentRaiseTicketId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch ticket data");
@@ -93,7 +93,7 @@ const ApartmentRaiseActionView = () => {
         const imageRequests =
           data.attachments?.map((photo) =>
             fetch(
-              `https://localhost:7091/api/FileUpload/download?generatedfilename=${photo}`,
+              `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
             )
               .then((res) => res.json())
               .then((data) => ({

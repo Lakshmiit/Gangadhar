@@ -21,7 +21,7 @@
 // }, [loading, orderBooking]);
 
 // useEffect(() => {
-//     fetch(`https://localhost:7091/api/BuyProduct/GetBuyProductDetailsById/${id}`)
+//     fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsById/${id}`)
 //       .then((res) => res.json())
 //       .then((data) => {
 //         setOrderBooking(data);
@@ -51,7 +51,7 @@
 //         };
 
 //         const response = await fetch(
-//           "https://localhost:7091/api/BuyProduct/buyProductEdit",
+//           "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/buyProductEdit",
 //           {
 //             method: "POST",
 //             headers: { "Content-Type": "application/json" },

@@ -57,7 +57,7 @@ const BookTechnicianActionView = () => {
     const fetchtechnicianData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7091/api/BookTechnician/GetBookTechnician/${raiseTicketId}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnician/${raiseTicketId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch technician data");
@@ -112,7 +112,7 @@ const BookTechnicianActionView = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://localhost:7091/api/Technician/GetTechnicianPincodesBycategory?Category=${category}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Technician/GetTechnicianPincodesBycategory?Category=${category}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch pincodes");
@@ -132,7 +132,7 @@ const BookTechnicianActionView = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://localhost:7091/api/Technician/GetTechniciannamesByPincodeAndCategory?pincode=${pincode}&category=${category}`,
+          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Technician/GetTechniciannamesByPincodeAndCategory?pincode=${pincode}&category=${category}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch technicians");
@@ -272,7 +272,7 @@ const BookTechnicianActionView = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:7091/api/BookTechnician/${raiseTicketId}`,
+        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/${raiseTicketId}`,
         {
           method: "PUT",
           headers: {

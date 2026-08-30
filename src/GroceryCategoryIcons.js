@@ -49,7 +49,7 @@
 //           setError("");
 
 //           const encodedCategory = encodeURIComponent(value);
-//           const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodedCategory}`;
+//           const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodedCategory}`;
 //           const response = await axios.get(url);
 //           const groceryData = response.data;
 

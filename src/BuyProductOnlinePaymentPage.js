@@ -15,7 +15,7 @@
 
 //   // ✅ Step 1: Fetch booking details from your API
 //   useEffect(() => {
-//     fetch(`https://localhost:7091/api/BuyProduct/GetBuyProductDetailsById/${id}`)
+//     fetch(`https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsById/${id}`)
 //       .then((res) => res.json())
 //       .then((data) => {
 //         setOrderBooking(data);

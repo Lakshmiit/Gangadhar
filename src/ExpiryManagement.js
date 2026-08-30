@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./ExpiryManagement.css";
 
 const API_URL =
-  "https://localhost:7091/api/UploadGrocery/GetAllGroceryItemsForAdmin";
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetAllGroceryItemsForAdmin";
 
 const ExpiryManagement = () => {
   const [items, setItems] = useState([]);

@@ -8,7 +8,8 @@ import { playNotificationSound } from "./notificationSound";
 // check, VendorOrdersPage, etc.) already talks to — keep this in sync so
 // GetDeliveryPartnerDetailsByUserId / Mart endpoints resolve the same way
 // everywhere.
-const API_BASE = "https://localhost:7091/api";
+const API_BASE =
+  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 const ASSIGNED_ORDERS_POLL_INTERVAL_MS = 20000;
 
 const DeliveryPartnerDashboard = () => {
