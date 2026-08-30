@@ -47,7 +47,7 @@ const AdminUpdateGrocery = () => {
       try {
         setLoading(true);
         const groceryResponse = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItems/${id}`,
+          `https://localhost:7091/api/UploadGrocery/GetGroceryItems/${id}`,
         );
         if (!groceryResponse.ok) {
           throw new Error("Grocery not found");
@@ -158,8 +158,7 @@ const AdminUpdateGrocery = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
-          fileName,
+        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
         {
           method: "POST",
           headers: {
@@ -210,7 +209,7 @@ const AdminUpdateGrocery = () => {
     };
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/UpdateGroceryItems?id=${uniqueId}`,
+        `https://localhost:7091/api/UploadGrocery/UpdateGroceryItems?id=${uniqueId}`,
         {
           method: "PUT",
           headers: {

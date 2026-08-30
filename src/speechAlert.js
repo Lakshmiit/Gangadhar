@@ -116,7 +116,7 @@ function googleTranslateTtsUrlFor(message, lang) {
  * lang="te-IN") if the network request is blocked or unreachable.
  */
 export function speakTeluguAlert(message) {
-  const audio = getAudio();
+  const audio = getAudio();       
   audio.src = googleTranslateTtsUrlFor(message, "te");
   audio.play().catch((err) => {
     console.warn(

@@ -13,7 +13,7 @@
 // } from "./utils/vendorListStore";
 
 // const VENDOR_UPLOAD_PRODUCTS_API =
-//   "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/vendorUploadProducts";
+//   "https://localhost:7091/api/VendorUploadProducts/vendorUploadProducts";
 // // Updates an EXISTING vendor record by id. The backend replaces the whole
 // // record with whatever we send, so the caller (handleSubmitFinal below) is
 // // responsible for merging newly-picked products into the vendor's
@@ -22,7 +22,7 @@
 // // the previously approved/pending items and metadata on this record would
 // // be wiped out.
 // const VENDOR_UPDATE_PRODUCTS_API =
-//   "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/UpdateVendorProductsValues";
+//   "https://localhost:7091/api/VendorUploadProducts/UpdateVendorProductsValues";
 
 // // Category display-order key: an array of category names, in the order
 // // the vendor has arranged them via the up/down arrows on this page. Kept
@@ -37,9 +37,9 @@
 // const pendingCartKey = (vendorId) => `vendorPendingProducts_${vendorId}`;
 
 // // Orders bell on this page polls the same endpoint VendorOrdersPage reads
-// // from. NOTE: this is the QA host, not the "lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net" base used
+// // from. NOTE: this is the QA host, not the "localhost:7091" base used
 // // elsewhere in this file — see VendorOrdersPage.js for why.
-// const ORDERS_API_BASE = "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+// const ORDERS_API_BASE = "https://localhost:7091/api";
 // const GET_VENDOR_ORDERS = `${ORDERS_API_BASE}/Mart/GetVendorOrdersByVendorId`;
 // const ORDERS_POLL_INTERVAL_MS = 25000;
 
@@ -906,16 +906,16 @@ import {
 } from "./utils/vendorListStore";
 
 const VENDOR_UPLOAD_PRODUCTS_API =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/vendorUploadProducts";
-// Updates an EXISTING vendor record by id. The backend replaces the whole
-// record with whatever we send, so the caller (handleSubmitFinal below) is
-// responsible for merging newly-picked products into the vendor's
-// already-submitted categories/products first, and for carrying forward
-// status/createdDate/pincodes — never send just the new selection here, or
-// the previously approved/pending items and metadata on this record would
-// be wiped out.
+  "https://localhost:7091/api/VendorUploadProducts/vendorUploadProducts";
 const VENDOR_UPDATE_PRODUCTS_API =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/UpdateVendorProductsValues";
+  "https://localhost:7091/api/VendorUploadProducts/UpdateVendorProductsValues";
+
+// Master-data endpoints for the State -> District -> Pincode cascade used
+// to pick which pincodes this vendor's submission should serve.
+const MASTER_DATA_API_BASE = "https://localhost:7091/api/MasterData";
+const GET_STATES_API = `${MASTER_DATA_API_BASE}/getStates`;
+const GET_DISTRICTS_API = `${MASTER_DATA_API_BASE}/getDistricts`;
+const GET_PINCODES_API = `${MASTER_DATA_API_BASE}/getPincodes`;
 
 // Category display-order key: an array of category names, in the order
 // the vendor has arranged them via the up/down arrows on this page. Kept
@@ -935,12 +935,39 @@ const categoryOrderKey = (vendorId) => `vendorCategoryOrder_${vendorId}`;
 const pendingCartKey = (vendorId) => `vendorPendingProducts_${vendorId}`;
 
 // Orders bell on this page polls the same endpoint VendorOrdersPage reads
-// from. NOTE: this is the QA host, not the "lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net" base used
+// from. NOTE: this is the QA host, not the "localhost:7091" base used
 // elsewhere in this file — see VendorOrdersPage.js for why.
-const ORDERS_API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const ORDERS_API_BASE = "https://localhost:7091/api";
 const GET_VENDOR_ORDERS = `${ORDERS_API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const ORDERS_POLL_INTERVAL_MS = 25000;
+
+// ---------------------------------------------------------------------
+// Master-data shape helpers — the getStates/getDistricts/getPincodes
+// endpoints aren't guaranteed to use the exact same field names, so pull
+// out an id/label defensively instead of assuming one casing.
+// ---------------------------------------------------------------------
+const getStateId = (s) => s?.stateId ?? s?.id ?? s?.StateId ?? s?.Id ?? "";
+const getStateName = (s) =>
+  s?.stateName ?? s?.name ?? s?.StateName ?? s?.Name ?? "";
+const getDistrictId = (d) =>
+  d?.districtId ?? d?.id ?? d?.DistrictId ?? d?.Id ?? "";
+const getDistrictName = (d) =>
+  d?.districtName ?? d?.name ?? d?.DistrictName ?? d?.Name ?? "";
+// The pincode list can come back either as an array of plain values
+// (e.g. ["530001", "530002"]) or an array of objects (e.g.
+// { pincode: "530001", pincodeId: 12 }) — handle both shapes.
+const getPincodeId = (p) => {
+  if (p === null || p === undefined) return "";
+  if (typeof p !== "object") return String(p);
+  return p.pincodeId ?? p.id ?? p.PincodeId ?? p.Id ?? "";
+};
+const getPincodeValue = (p) => {
+  if (p === null || p === undefined) return "";
+  if (typeof p !== "object") return String(p);
+  return (
+    p.pincode ?? p.pinCode ?? p.code ?? p.Pincode ?? p.name ?? p.Name ?? ""
+  );
+};
 
 const VendorPreviewPage = () => {
   const { vendorId } = useParams();
@@ -970,6 +997,200 @@ const VendorPreviewPage = () => {
   // arranged position, brand-new ones are appended at the end, and ones
   // that dropped out of pendingCart (qty back to 0) are dropped here too.
   const [categoryOrder, setCategoryOrder] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // ------------------------------------------------------------
+  // State -> District -> Pincode cascade. formData holds the currently
+  // selected dropdowns; selectedPincodes is the running set of pincodes
+  // (checkbox-checked, can span multiple states/districts visited over
+  // time) that gets sent to the server on submit.
+  // ------------------------------------------------------------
+  const [stateList, setStateList] = useState([]);
+  const [districtList, setDistrictList] = useState([]);
+  const [pincodeList, setPincodeList] = useState([]);
+  const [statesLoading, setStatesLoading] = useState(false);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+  const [pincodesLoading, setPincodesLoading] = useState(false);
+  const [formData, setFormData] = useState({ stateId: "", districtId: "" });
+
+  // pincode value (string) -> checked/unchecked. Only checked pincodes are
+  // sent to the server when "Submit for approval" is clicked.
+  const [selectedPincodes, setSelectedPincodes] = useState({});
+  // Seed the checkboxes once from whatever pincodes are already on this
+  // vendor's record/pendingCart, so re-opening this page doesn't silently
+  // drop previously-chosen pincodes that aren't in the currently-loaded list.
+  const seededPincodesRef = useRef(false);
+  // Seed the State / District dropdowns once from the vendor's own
+  // profile/record, so a vendor who already has a registered state and
+  // district sees them pre-selected instead of starting from blank.
+  const seededStateRef = useRef(false);
+  const seededDistrictRef = useRef(false);
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const normalizeText = (value) =>
+    String(value ?? "")
+      .trim()
+      .toLowerCase();
+
+  const matchesQuery = (value) => {
+    if (!normalizedQuery) return true;
+
+    return normalizeText(value).includes(normalizedQuery);
+  };
+
+  const orderedPendingCategories = useMemo(() => {
+    const cats = pendingCart?.categorie || [];
+    const byName = new Map(cats.map((cat) => [cat.categoryName, cat]));
+    const ordered = categoryOrder
+      .map((name) => byName.get(name))
+      .filter(Boolean);
+    cats.forEach((cat) => {
+      if (!categoryOrder.includes(cat.categoryName)) ordered.push(cat);
+    });
+    return ordered.map((cat, idx) => ({ ...cat, rank: String(idx + 1) }));
+  }, [pendingCart, categoryOrder]);
+
+  const statusByProductId = useMemo(() => {
+    const map = {};
+    (myProducts?.categories || []).forEach((cat) => {
+      (cat.products || []).forEach((p) => {
+        map[String(p.productId)] = p.status || "Pending";
+      });
+    });
+    return map;
+  }, [myProducts]);
+
+  const readyToSubmitCategories = useMemo(() => {
+    return orderedPendingCategories
+      .map((cat) => ({
+        ...cat,
+        products: (cat.products || []).filter(
+          (p) => statusByProductId[String(p.productIds)] !== "Approved",
+        ),
+      }))
+      .filter((cat) => cat.products.length > 0);
+  }, [orderedPendingCategories, statusByProductId]);
+
+  const productNameById = useMemo(() => {
+    const map = {};
+    catalogItems.forEach((item) => {
+      map[String(item.id)] = item.name;
+    });
+    return map;
+  }, [catalogItems]);
+
+  // ------------------------------------------------------------
+  // Get product name from catalog
+  // Supports both id/productId formats
+  // ------------------------------------------------------------
+  const getProductName = (product) => {
+    const productId =
+      product?.productIds ?? product?.productId ?? product?.id ?? "";
+
+    const catalogProduct = catalogItems.find(
+      (item) =>
+        String(item.id ?? item.productId ?? item.productIds) ===
+        String(productId),
+    );
+
+    return (
+      product?.name ||
+      product?.productName ||
+      catalogProduct?.name ||
+      catalogProduct?.productName ||
+      `Product ${productId}`
+    );
+  };
+
+  const searchedReadyToSubmitCategories = useMemo(() => {
+    if (!normalizedQuery) {
+      return readyToSubmitCategories;
+    }
+
+    return readyToSubmitCategories
+      .map((cat) => {
+        const categoryName = cat.categoryName || "";
+        const categoryMatches = matchesQuery(categoryName);
+        const matchingProducts = (cat.products || []).filter((product) => {
+          const productName = getProductName(product);
+
+          const productId = product?.productIds ?? product?.productId ?? "";
+
+          return matchesQuery(productName) || matchesQuery(productId);
+        });
+
+        return {
+          ...cat,
+          products: categoryMatches ? cat.products || [] : matchingProducts,
+        };
+      })
+      .filter((cat) => cat.products && cat.products.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readyToSubmitCategories, normalizedQuery, catalogItems]);
+
+  const approvedCategories = useMemo(() => {
+    return (myProducts?.categories || [])
+      .map((cat) => ({
+        ...cat,
+        products: (cat.products || []).filter((p) => p.status === "Approved"),
+      }))
+      .filter((cat) => cat.products.length > 0);
+  }, [myProducts]);
+
+  const searchedApprovedCategories = useMemo(() => {
+    if (!normalizedQuery) {
+      return approvedCategories;
+    }
+
+    return approvedCategories
+      .map((cat) => {
+        const categoryName = cat.category || "";
+
+        const categoryMatches = matchesQuery(categoryName);
+
+        const matchingProducts = (cat.products || []).filter((product) => {
+          const productName = getProductName(product);
+
+          const productId = product?.productId ?? product?.productIds ?? "";
+
+          return matchesQuery(productName) || matchesQuery(productId);
+        });
+
+        return {
+          ...cat,
+          products: categoryMatches ? cat.products || [] : matchingProducts,
+        };
+      })
+      .filter((cat) => cat.products && cat.products.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [approvedCategories, normalizedQuery, catalogItems]);
+
+  useEffect(() => {
+    if (!normalizedQuery) return;
+    setExpandedCategories((prev) => {
+      const next = { ...prev };
+      searchedReadyToSubmitCategories.forEach((cat) => {
+        next[cat.categoryName] = true;
+      });
+      searchedApprovedCategories.forEach((cat) => {
+        next[`approved-${cat.category}`] = true;
+      });
+      return next;
+    });
+  }, [
+    normalizedQuery,
+    searchedReadyToSubmitCategories,
+    searchedApprovedCategories,
+  ]);
+
+  const toggleCategoryExpanded = (categoryName) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [categoryName]: !prev[categoryName],
+    }));
+  };
 
   useEffect(() => {
     const sessionId = localStorage.getItem("vendorSession");
@@ -1068,13 +1289,9 @@ const VendorPreviewPage = () => {
     };
   }, [vendor]);
 
-  const productNameById = useMemo(() => {
-    const map = {};
-    catalogItems.forEach((item) => {
-      map[String(item.id)] = item.name;
-    });
-    return map;
-  }, [catalogItems]);
+  // productId -> status ("Approved" | "Pending" | etc), sourced from the
+  // vendor's real server record. Used to keep "Products ready to submit"
+  // and "Your submitted products" mutually exclusive by status.
 
   useEffect(() => {
     if (!vendorId) return;
@@ -1096,13 +1313,6 @@ const VendorPreviewPage = () => {
     };
   }, [vendorId]);
 
-  // Load the local candidate cart saved from the Stock Update page, and
-  // default every product in it to "checked" for the final submission.
-  // This is re-run (not just mount-once) so that Excel-driven bulk updates
-  // made on the Stock Update page — in this tab or another one — are
-  // reflected here as soon as this page becomes active again, instead of
-  // being stuck showing whatever was in localStorage the first time this
-  // component happened to mount.
   useEffect(() => {
     if (!vendorId) return;
 
@@ -1117,9 +1327,6 @@ const VendorPreviewPage = () => {
         const parsed = JSON.parse(raw);
         setPendingCart(parsed);
         setFinalSelected((prev) => {
-          // Keep any existing checked/unchecked choices the vendor already
-          // made in this session; only default newly-appeared products
-          // (e.g. from a fresh Excel import) to checked.
           const next = {};
           (parsed.categorie || []).forEach((cat) => {
             (cat.products || []).forEach((p) => {
@@ -1191,15 +1398,196 @@ const VendorPreviewPage = () => {
     });
   }, [vendorId, pendingCart]);
 
+  // ============================================================
+  // Load States (once, on mount)
+  // ============================================================
+  useEffect(() => {
+    setStatesLoading(true);
+
+    axios
+      .get(GET_STATES_API)
+      .then((response) => {
+        setStateList(Array.isArray(response.data) ? response.data : []);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+        setError("Could not load states. Please refresh and try again.");
+      })
+      .finally(() => {
+        setStatesLoading(false);
+      });
+  }, []);
+
+  // ============================================================
+  // Load Districts using State ID
+  // ============================================================
+  useEffect(() => {
+    if (!formData.stateId) {
+      setDistrictList([]);
+      return;
+    }
+
+    setDistrictsLoading(true);
+    setDistrictList([]);
+
+    axios
+      .get(`${GET_DISTRICTS_API}/${formData.stateId}`)
+      .then((response) => {
+        setDistrictList(Array.isArray(response.data) ? response.data : []);
+      })
+      .catch((error) => {
+        console.error("Error fetching districts:", error);
+        setError("Could not load districts. Please try again.");
+        setDistrictList([]);
+      })
+      .finally(() => {
+        setDistrictsLoading(false);
+      });
+  }, [formData.stateId]);
+
+  // ============================================================
+  // Load Pincodes using District ID
+  // ============================================================
+  useEffect(() => {
+    if (!formData.districtId) {
+      setPincodeList([]);
+      setPincodesLoading(false);
+      return;
+    }
+
+    setPincodesLoading(true);
+    setPincodeList([]);
+
+    axios
+      .get(`${GET_PINCODES_API}/${formData.districtId}`)
+      .then((response) => {
+        const raw = Array.isArray(response.data) ? response.data : [];
+        // A handful of rows in the master data have no pincode value at
+        // all (null/blank) — drop those here instead of rendering an
+        // empty, unusable checkbox for each one.
+        const withValue = raw.filter(
+          (p) => String(getPincodeValue(p) ?? "").trim() !== "",
+        );
+        if (withValue.length !== raw.length) {
+          console.warn(
+            `getPincodes returned ${raw.length} rows, ${
+              raw.length - withValue.length
+            } had no pincode value:`,
+            raw,
+          );
+        }
+        setPincodeList(withValue);
+      })
+      .catch((error) => {
+        console.error("Error fetching pincodes:", error);
+        setError("Could not load pincodes. Please try again.");
+        setPincodeList([]);
+      })
+      .finally(() => {
+        setPincodesLoading(false);
+      });
+  }, [formData.districtId]);
+
+  // Seed the pincode checkboxes once from whatever's already saved on this
+  // vendor's server record (myProducts.pincodes) or the local pendingCart,
+  // so previously-picked pincodes stay checked even before their state/
+  // district has been re-selected on this page.
+  useEffect(() => {
+    if (seededPincodesRef.current) return;
+    const existing =
+      (Array.isArray(myProducts?.pincodes) && myProducts.pincodes.length
+        ? myProducts.pincodes
+        : pendingCart?.pincodes) || [];
+    if (!Array.isArray(existing) || existing.length === 0) return;
+    setSelectedPincodes((prev) => {
+      const next = { ...prev };
+      existing.forEach((pin) => {
+        next[String(pin)] = true;
+      });
+      return next;
+    });
+    seededPincodesRef.current = true;
+  }, [myProducts, pendingCart]);
+
+  // ------------------------------------------------------------
+  // Auto-select the vendor's own State once both the vendor profile and
+  // the states list are available. Same idea as everywhere else this
+  // page reads "vendor details" (vendor.storeName, vendor.email, etc. in
+  // the header card below): read it straight off the `vendor` object
+  // that was loaded from localStorage's "vendorProfile" / the vendor's
+  // server record. We try a direct id first (vendor.stateId), and fall
+  // back to matching a stored state *name* (vendor.state / vendor.stateName)
+  // against the loaded stateList, in case the vendor record only stores
+  // the name rather than the master-data id.
+  // ------------------------------------------------------------
+  useEffect(() => {
+    if (seededStateRef.current) return;
+    if (!vendor || stateList.length === 0) return;
+
+    const directId = vendor.stateId ?? vendor.StateId ?? "";
+    let stateId = directId ? String(directId) : "";
+
+    if (!stateId) {
+      const vendorStateName = vendor.state ?? vendor.stateName ?? "";
+      if (vendorStateName) {
+        const match = stateList.find(
+          (s) =>
+            normalizeText(getStateName(s)) === normalizeText(vendorStateName),
+        );
+        if (match) stateId = String(getStateId(match));
+      }
+    }
+
+    if (stateId) {
+      setFormData((prev) => ({ ...prev, stateId }));
+    }
+    seededStateRef.current = true;
+  }, [vendor, stateList]);
+
+  // Auto-select the vendor's own District, once the districtList for the
+  // (auto-selected, above) state has loaded. Same direct-id-then-name-match
+  // approach as the state seeding above.
+  useEffect(() => {
+    if (seededDistrictRef.current) return;
+    if (!vendor || districtList.length === 0) return;
+
+    const directId = vendor.districtId ?? vendor.DistrictId ?? "";
+    let districtId = directId ? String(directId) : "";
+
+    if (!districtId) {
+      const vendorDistrictName = vendor.district ?? vendor.districtName ?? "";
+      if (vendorDistrictName) {
+        const match = districtList.find(
+          (d) =>
+            normalizeText(getDistrictName(d)) ===
+            normalizeText(vendorDistrictName),
+        );
+        if (match) districtId = String(getDistrictId(match));
+      }
+    }
+
+    if (districtId) {
+      setFormData((prev) => ({ ...prev, districtId }));
+    }
+    seededDistrictRef.current = true;
+  }, [vendor, districtList]);
+
+  const togglePincode = (pincodeValue) => {
+    const key = String(pincodeValue);
+    setSelectedPincodes((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const selectedPincodeValues = useMemo(
+    () => Object.keys(selectedPincodes).filter((key) => selectedPincodes[key]),
+    [selectedPincodes],
+  );
+
   const persistCategoryOrder = (order) => {
     try {
       localStorage.setItem(categoryOrderKey(vendorId), JSON.stringify(order));
-    } catch {
-      // storage full/unavailable — arrangement still works for this session
-    }
+    } catch {}
   };
 
-  // Move a category up (-1) or down (+1) in the vendor's display order.
   const moveCategory = (index, direction) => {
     setCategoryOrder((prev) => {
       const targetIndex = index + direction;
@@ -1211,33 +1599,40 @@ const VendorPreviewPage = () => {
     });
   };
 
-  // pendingCart.categorie re-sorted to match the vendor's arranged order,
-  // with each category's 1-based position attached as "rank" — this is
-  // what's rendered below and what gets sent on final submission.
-  const orderedPendingCategories = useMemo(() => {
-    const cats = pendingCart?.categorie || [];
-    const byName = new Map(cats.map((cat) => [cat.categoryName, cat]));
-    const ordered = categoryOrder
-      .map((name) => byName.get(name))
-      .filter(Boolean);
-    cats.forEach((cat) => {
-      if (!categoryOrder.includes(cat.categoryName)) ordered.push(cat);
-    });
-    return ordered.map((cat, idx) => ({ ...cat, rank: String(idx + 1) }));
-  }, [pendingCart, categoryOrder]);
-
   const pendingProductCount = useMemo(
     () =>
-      (pendingCart?.categorie || []).reduce(
+      readyToSubmitCategories.reduce(
         (sum, cat) => sum + (cat.products?.length || 0),
         0,
       ),
-    [pendingCart],
+    [readyToSubmitCategories],
   );
-  const finalSelectedCount = useMemo(
-    () => Object.values(finalSelected).filter(Boolean).length,
-    [finalSelected],
-  );
+
+  const finalSelectedCount = useMemo(() => {
+    let count = 0;
+    readyToSubmitCategories.forEach((cat) => {
+      (cat.products || []).forEach((p) => {
+        if (finalSelected[`${cat.categoryName}||${p.productIds}`]) count++;
+      });
+    });
+    return count;
+  }, [readyToSubmitCategories, finalSelected]);
+
+  const selectedStateName = useMemo(() => {
+    const match = stateList.find(
+      (s) => String(getStateId(s)) === String(formData.stateId),
+    );
+    return getStateName(match) || vendor?.state || vendor?.stateName || "";
+  }, [stateList, formData.stateId, vendor]);
+
+  const selectedDistrictName = useMemo(() => {
+    const match = districtList.find(
+      (d) => String(getDistrictId(d)) === String(formData.districtId),
+    );
+    return (
+      getDistrictName(match) || vendor?.district || vendor?.districtName || ""
+    );
+  }, [districtList, formData.districtId, vendor]);
 
   const toggleFinalSelected = (categoryName, productId) => {
     const key = `${categoryName}||${productId}`;
@@ -1247,23 +1642,11 @@ const VendorPreviewPage = () => {
   if (!vendor) return null;
 
   const handleBackToProfile = () => {
-    // Sent here from the customer ProfilePage (which stashes where to
-    // return to). Falls back to the app root if that's missing.
     const returnTo = localStorage.getItem("vendorReturnProfile");
     navigate(returnTo || "/");
   };
 
-  // Merges newly-selected {categoryName, products:[{productIds, quantity,
-  // discount}]} entries into the vendor's already-submitted categories
-  // (myProducts, normalized shape: {category, products:[{productId, qty,
-  // discount}]}). Existing categories/products are preserved; a product
-  // already in a category gets its quantity/discount updated in place, a
-  // new product is appended to that category's product list, and a
-  // brand-new category is appended as a whole new entry. Returns the
-  // merged list already in the PascalCase shape UpdateVendorProductsValues
-  // expects.
   const mergeIntoExistingCategorie = (existingVendor, newCategorie) => {
-    // existingCats: categoryName -> Map(productId -> {quantity, discount})
     const existingCats = new Map();
     const order = [];
     (existingVendor?.categories || []).forEach((cat) => {
@@ -1287,13 +1670,13 @@ const VendorPreviewPage = () => {
         order.push(cat.categoryName);
       }
       (cat.products || []).forEach((p) => {
-        // Upsert: overwrites quantity/discount if this product was already
-        // on the record, adds it if it wasn't — everything else in the
-        // category (and every other category) is left untouched.
+        // Upsert: overwrites quantity/discount/limit if this product was
+        // already on the record, adds it if it wasn't — everything else in
+        // the category (and every other category) is left untouched.
         productMap.set(String(p.productIds), {
           quantity: String(p.quantity),
           discount: String(p.discount),
-          limit: String(p.limit),
+          limit: String(p.limit ?? 0),
         });
       });
     });
@@ -1320,7 +1703,7 @@ const VendorPreviewPage = () => {
           ProductIds: productId,
           Quantity: v.quantity,
           Discount: v.discount,
-          limit: v.limit,
+          Limit: v.limit,
         }),
       ),
     }));
@@ -1328,13 +1711,16 @@ const VendorPreviewPage = () => {
 
   const handleSubmitFinal = async () => {
     if (!pendingCart) return;
-    const categorie = orderedPendingCategories
+    const categorie = readyToSubmitCategories
       .map((cat) => ({
         categoryName: cat.categoryName,
         rank: cat.rank,
-        products: (cat.products || []).filter(
-          (p) => finalSelected[`${cat.categoryName}||${p.productIds}`],
-        ),
+        products: (cat.products || [])
+          .filter((p) => finalSelected[`${cat.categoryName}||${p.productIds}`])
+          .map((p) => ({
+            ...p,
+            limit: p.limit ?? "0",
+          })),
       }))
       .filter((cat) => cat.products.length > 0)
       // Re-number after dropping unselected categories so rank stays a
@@ -1343,6 +1729,11 @@ const VendorPreviewPage = () => {
 
     if (!categorie.length) {
       setError("Select at least one product before submitting for approval.");
+      return;
+    }
+
+    if (selectedPincodeValues.length === 0) {
+      setError("Select at least one pincode before submitting for approval.");
       return;
     }
 
@@ -1366,10 +1757,6 @@ const VendorPreviewPage = () => {
           myProducts,
           categorie,
         );
-        // Full VendorProducts shape expected by UpdateVendorProductsValues —
-        // this PUT replaces the whole record server-side, so every field on
-        // the C# model is carried forward from the existing record (falling
-        // back to pendingCart/vendor only where myProducts has nothing).
         const updatePayload = {
           id: myProducts.id,
           VendorId: String(vendorId || ""),
@@ -1385,12 +1772,12 @@ const VendorPreviewPage = () => {
             pendingCart.createdDate ||
             new Date().toISOString(),
           UpdatedDate: new Date().toISOString(),
-          Pincodes: Array.isArray(myProducts.pincodes)
-            ? myProducts.pincodes
-            : Array.isArray(pendingCart.pincodes)
-              ? pendingCart.pincodes
-              : [],
+          Pincodes: selectedPincodeValues,
           Categorie: mergedCategorie,
+          District: selectedDistrictName,
+          DistrictId: formData.districtId,
+          State: selectedStateName,
+          StateId: formData.stateId,
         };
 
         console.log(
@@ -1418,10 +1805,12 @@ const VendorPreviewPage = () => {
           status: pendingCart.status || "Pending",
           createdDate: pendingCart.createdDate || new Date().toISOString(),
           updatedDate: new Date().toISOString(),
-          pincodes: Array.isArray(pendingCart.pincodes)
-            ? pendingCart.pincodes
-            : [],
+          pincodes: selectedPincodeValues,
           categorie,
+          state: selectedStateName,
+          stateId: formData.stateId,
+          district: selectedDistrictName,
+          districtId: formData.districtId,
         };
 
         console.log(
@@ -1472,8 +1861,11 @@ const VendorPreviewPage = () => {
     }
   };
 
+  // Only categories that have at least one Approved product show in
+  // "Your submitted products".
+
   return (
-    <div className="container py-4 pb-5">
+    <div className="container py-4 pb-5" style={{ maxWidth: "1140px" }}>
       <button
         type="button"
         className="btn btn-outline-secondary btn-sm mb-3 d-inline-flex align-items-center gap-1"
@@ -1607,8 +1999,104 @@ const VendorPreviewPage = () => {
       {message && <div className="alert alert-success">{message}</div>}
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* ---- Products picked on the Stock Update page, awaiting final submission ---- */}
-      <div className="card border-0 shadow-sm mb-4">
+      {/* ---- Service area: State -> District -> Pincode (checkbox) ---- */}
+      <div className="card border-0 shadow-sm">
+        <div className="card-body p-4">
+          <h3 className="mb-1">Service area</h3>
+          <p className="text-muted small">
+            Pick a state and district to browse pincodes, then check every
+            pincode you want to serve. Checked pincodes are sent along with your
+            submission when you click "Submit for approval".
+          </p>
+
+          <div className="row g-3">
+            <div className="col-12 col-md-4">
+              <div className="d-flex align-items-center gap-2">
+                <label className="form-label small fw-bold mb-0 text-nowrap">
+                  State:
+                </label>
+                <div className="form-control-plaintext fw-semibold text-danger">
+                  {statesLoading ? "Loading…" : selectedStateName || "—"}
+                </div>
+              </div>
+            </div>
+
+            <div className="col-12 col-md-4">
+              <div className="d-flex align-items-center gap-2">
+                <label className="form-label small fw-bold mb-0 text-nowrap">
+                  District:
+                </label>
+                <div className="form-control-plaintext fw-semibold text-danger">
+                  {districtsLoading ? "Loading…" : selectedDistrictName || "—"}
+                </div>
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label small fw-bold">
+                Pincodes selected -- {selectedPincodeValues.length}
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-1">
+            {!formData.districtId ? (
+              <p className="text-muted small mb-0">
+                Select a district above to see its pincodes.
+              </p>
+            ) : pincodesLoading ? (
+              <div className="text-center py-3">
+                <div className="spinner-border spinner-border-sm text-success" />
+                <span className="ms-2 small text-muted">Loading pincodes…</span>
+              </div>
+            ) : pincodeList.length === 0 ? (
+              <p className="text-muted small mb-0">
+                No pincodes found for this district.
+              </p>
+            ) : (
+              <div className="row g-2">
+                {pincodeList.map((p) => {
+                  const value = getPincodeValue(p);
+                  const key = String(value);
+                  const checked = !!selectedPincodes[key];
+                  return (
+                    <div
+                      className="col-6 col-sm-4 col-md-3"
+                      key={getPincodeId(p) || key}
+                    >
+                      <label
+                        className={`border rounded p-2 small d-flex align-items-center gap-2 w-100 ${
+                          checked ? "border-success border-2" : ""
+                        }`}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <input
+                          type="checkbox"
+                          className="form-check-input border-dark"
+                          checked={checked}
+                          onChange={() => togglePincode(value)}
+                        />
+                        {value}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ---- Products picked on the Stock Update page, awaiting final submission (non-approved only) ---- */}
+      <div className="card border-0 shadow-sm">
+        <div>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search products or categories…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         <div className="card-body p-4">
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <h3 className="mb-0">Products ready to submit</h3>
@@ -1638,76 +2126,94 @@ const VendorPreviewPage = () => {
                 Use the arrows to arrange the order these categories appear in
                 on your storefront.
               </p>
-              {orderedPendingCategories.map((cat, index) => (
-                <div key={cat.categoryName} className="mb-3">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <span className="badge bg-secondary">#{cat.rank}</span>
-                    <h6 className="mb-0">{cat.categoryName}</h6>
-                    <div
-                      className="btn-group btn-group-sm ms-auto"
-                      role="group"
-                    >
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        title="Move up"
-                        disabled={index === 0}
-                        onClick={() => moveCategory(index, -1)}
+              {readyToSubmitCategories.map((cat, index) => {
+                const isExpanded = !!expandedCategories[cat.categoryName];
+                return (
+                  <div key={cat.categoryName} className="mb-3">
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      <span className="badge bg-secondary">#{cat.rank}</span>
+                      <h6
+                        className="mb-0"
+                        role="button"
+                        style={{ cursor: "pointer", userSelect: "none" }}
+                        onClick={() => toggleCategoryExpanded(cat.categoryName)}
                       >
-                        &uarr;
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        title="Move down"
-                        disabled={index === orderedPendingCategories.length - 1}
-                        onClick={() => moveCategory(index, 1)}
+                        {cat.categoryName}{" "}
+                        <span style={{ fontSize: "0.75em" }}>
+                          {isExpanded ? "▲" : "▼"}
+                        </span>
+                      </h6>
+                      <div
+                        className="btn-group btn-group-sm ms-auto"
+                        role="group"
                       >
-                        &darr;
-                      </button>
-                    </div>
-                  </div>
-                  <div className="row g-2">
-                    {cat.products.map((p) => {
-                      const key = `${cat.categoryName}||${p.productIds}`;
-                      const checked = !!finalSelected[key];
-                      return (
-                        <div
-                          className="col-12 col-sm-6 col-lg-4"
-                          key={p.productIds}
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          title="Move up"
+                          disabled={index === 0}
+                          onClick={() => moveCategory(index, -1)}
                         >
-                          <label
-                            className={`border rounded p-2 small d-flex align-items-start gap-2 w-100 ${checked ? "border-success border-2" : ""}`}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <input
-                              type="checkbox"
-                              className="form-check-input mt-1"
-                              checked={checked}
-                              onChange={() =>
-                                toggleFinalSelected(
-                                  cat.categoryName,
-                                  p.productIds,
-                                )
-                              }
-                            />
-                            <div>
-                              <div className="fw-bold">
-                                {productNameById[p.productIds] ||
-                                  `Product ${p.productIds}`}
-                              </div>
-                              <div className="text-muted">
-                                Qty: {p.quantity} &middot; Discount:{" "}
-                                {p.discount}%
-                              </div>
+                          &uarr;
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          title="Move down"
+                          disabled={
+                            index === readyToSubmitCategories.length - 1
+                          }
+                          onClick={() => moveCategory(index, 1)}
+                        >
+                          &darr;
+                        </button>
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="row g-2">
+                        {cat.products.map((p) => {
+                          const key = `${cat.categoryName}||${p.productIds}`;
+                          const checked = !!finalSelected[key];
+                          return (
+                            <div
+                              className="col-12 col-sm-6 col-lg-4 col-xl-8"
+                              key={p.productIds}
+                            >
+                              <label
+                                className={`border rounded p-2 small d-flex align-items-start gap-2 w-100 ${checked ? "border-success border-2" : ""}`}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="form-check-input mt-1"
+                                  checked={checked}
+                                  onChange={() =>
+                                    toggleFinalSelected(
+                                      cat.categoryName,
+                                      p.productIds,
+                                    )
+                                  }
+                                />
+                                <div>
+                                  <div className="fw-bold">
+                                    {productNameById[p.productIds] ||
+                                      `Product ${p.productIds}`}
+                                  </div>
+                                  <div className="text-muted">
+                                    Qty: {p.quantity} &middot; Discount:{" "}
+                                    {p.discount}% &middot; Limit: {p.limit ?? 0}
+                                  </div>
+                                </div>
+                              </label>
                             </div>
-                          </label>
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <div className="d-flex justify-content-end mt-3">
                 <button
@@ -1725,7 +2231,7 @@ const VendorPreviewPage = () => {
         </div>
       </div>
 
-      {/* ---- Vendor's already-submitted products, from the server ---- */}
+      {/* ---- Vendor's already-submitted products, from the server (Approved only) ---- */}
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-body p-4">
           <h3 className="mb-3">Your submitted products</h3>
@@ -1734,51 +2240,65 @@ const VendorPreviewPage = () => {
               <div className="spinner-border text-success" />
               <p className="mt-2 mb-0">Loading your products…</p>
             </div>
-          ) : myProducts ? (
+          ) : approvedCategories.length > 0 ? (
             <>
-              <span
-                className={`badge mb-3 ${myProducts.status === "Approved" ? "bg-success" : "bg-warning text-dark"}`}
-              >
-                {myProducts.status || "Pending Approval"}
-              </span>
-              {myProducts.categories.map((cat) => (
-                <div key={cat.category} className="mb-3">
-                  <h6 className="mb-2">{cat.category}</h6>
-                  <div className="row g-2">
-                    {cat.products.map((p) => (
-                      <div
-                        className="col-12 col-sm-6 col-lg-4"
-                        key={p.productId}
-                      >
-                        <div className="border rounded p-2 small">
-                          <div className="d-flex justify-content-between align-items-start gap-2">
-                            <div>
-                              {p.name ||
-                                productNameById[p.productId] ||
-                                `Product ${p.productId}`}
+              <span className="badge mb-3 bg-success">Approved</span>
+              {approvedCategories.map((cat) => {
+                const isExpanded =
+                  !!expandedCategories[`approved-${cat.category}`];
+                return (
+                  <div key={cat.category} className="mb-3">
+                    <h6
+                      className="mb-2"
+                      role="button"
+                      style={{ cursor: "pointer", userSelect: "none" }}
+                      onClick={() =>
+                        toggleCategoryExpanded(`approved-${cat.category}`)
+                      }
+                    >
+                      {cat.category}{" "}
+                      <span style={{ fontSize: "0.75em" }}>
+                        {isExpanded ? "▲" : "▼"}
+                      </span>
+                    </h6>
+                    {isExpanded && (
+                      <div className="row g-2">
+                        {cat.products.map((p) => (
+                          <div
+                            className="col-12 col-sm-6 col-lg-4 col-xl-8"
+                            key={p.productId}
+                          >
+                            <div className="border rounded p-2 small">
+                              <div className="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                  {p.name ||
+                                    productNameById[p.productId] ||
+                                    `Product ${p.productId}`}
+                                </div>
+                                <span
+                                  className="badge bg-success"
+                                  style={{ fontSize: "10px" }}
+                                >
+                                  Approved
+                                </span>
+                              </div>
+                              <div>
+                                Qty: {p.qty} &middot; Discount: {p.discount}%
+                                &middot; Limit: {p.limit}
+                              </div>
                             </div>
-                            <span
-                              className={`badge ${p.status === "Approved" ? "bg-success" : "bg-warning text-dark"}`}
-                              style={{ fontSize: "10px" }}
-                            >
-                              {p.status || "Pending"}
-                            </span>
                           </div>
-                          <div>
-                            Qty: {p.qty} &middot; Discount: {p.discount}%
-                            &middot; Limit: {p.limit}
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </>
           ) : (
             <div className="text-center py-3">
               <p className="text-muted mb-0">
-                No products submitted yet — Pending
+                No approved products yet — still pending review.
               </p>
             </div>
           )}

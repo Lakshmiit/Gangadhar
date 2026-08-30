@@ -52,7 +52,7 @@
 // };
 
 //   useEffect(() => {
-//     axios.get("https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates")
+//     axios.get("https://localhost:7091/api/MasterData/getStates")
 //       .then((res) => {
 //         setStateList(res.data || []);
 //         setStateId("");
@@ -62,7 +62,7 @@
 
 //   useEffect(() => {
 //     if (!stateId) { setDistrictList([]); return; }
-//     axios.get(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`)
+//     axios.get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
 //       .then((res) => setDistrictList(res.data || []))
 //       .catch((err) => console.error("Error fetching districts:", err));
 //   }, [stateId]);
@@ -94,7 +94,7 @@
 //   const handleDelete = (technicianId) => {
 //     const confirmDelete = window.confirm('Are you sure you want to delete this ticket?');
 //     if (confirmDelete) {
-//       axios.delete(`https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${technicianId}`)
+//       axios.delete(`https://localhost:7091/api/RaiseTicket/${technicianId}`)
 //         .then(() => {
 //           setDeliveryData(prevData => prevData.filter(technician => technician.id !== technicianId));
 //           setFilteredData(prevData => prevData.filter(technician => technician.id !== technicianId));

@@ -110,8 +110,7 @@ const VendorUploadGrocery = () => {
       formData.append("fileName", fileName);
 
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
-          fileName,
+        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
         {
           method: "POST",
           headers: {
@@ -153,7 +152,7 @@ const VendorUploadGrocery = () => {
       console.log("Loading vendor:", vendorId);
 
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/GetVendorDetailsByvendorId?vendorId=${vendorId}`,
+        `https://localhost:7091/api/VendorRegistration/GetVendorDetailsByvendorId?vendorId=${vendorId}`,
       );
 
       const data = await response.json();
@@ -216,7 +215,7 @@ const VendorUploadGrocery = () => {
     };
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/UploadGrocery`,
+        `https://localhost:7091/api/UploadGrocery/UploadGrocery`,
         {
           method: "POST",
           headers: {

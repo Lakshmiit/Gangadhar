@@ -23,7 +23,7 @@ const AdminProductList = () => {
   // Fetch product data, categories, and catalogues
   useEffect(() => {
     setLoading(true);
-    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/GetAdminProductList?ProductOwnedBy=Admin`;
+    const url = `https://localhost:7091/api/Product/GetAdminProductList?ProductOwnedBy=Admin`;
     axios
       .get(url)
       .then((response) => {
@@ -65,9 +65,7 @@ const AdminProductList = () => {
     );
     if (confirmDelete) {
       axios
-        .delete(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${productId}`,
-        )
+        .delete(`https://localhost:7091/api/Product/${productId}`)
         .then(() => {
           setProductData((prevData) =>
             prevData.filter((product) => product.id !== productId),

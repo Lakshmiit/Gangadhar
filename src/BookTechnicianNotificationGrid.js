@@ -33,7 +33,7 @@ const BookTechnicianNotification = () => {
 
   useEffect(() => {
     setLoading(true);
-    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnicianForAdminList`;
+    const url = `https://localhost:7091/api/BookTechnician/GetBookTechnicianForAdminList`;
     axios
       .get(url)
       .then((response) => {
@@ -85,9 +85,7 @@ const BookTechnicianNotification = () => {
     );
     if (confirmDelete) {
       axios
-        .delete(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${technicianId}`,
-        )
+        .delete(`https://localhost:7091/api/RaiseTicket/${technicianId}`)
         .then(() => {
           setTechnicianData((prevData) =>
             prevData.filter((technician) => technician.id !== technicianId),

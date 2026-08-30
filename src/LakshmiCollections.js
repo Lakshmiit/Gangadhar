@@ -46,7 +46,7 @@ const LakshmiCollections = () => {
       try {
         setSelectedCategory(encodedCategory);
         setImageLoading(true);
-        const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetAllLakshmiCollectionsByCategory?category=${encodedCategory}`;
+        const url = `https://localhost:7091/api/UploadLakshmiCollection/GetAllLakshmiCollectionsByCategory?category=${encodedCategory}`;
         const response = await axios.get(url);
         const list = Array.isArray(response.data) ? response.data : [];
         const approvedList = list.filter(
@@ -62,7 +62,7 @@ const LakshmiCollections = () => {
           if (!firstPhoto) return;
           try {
             const res = await fetch(
-              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(firstPhoto)}`,
+              `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(firstPhoto)}`,
             );
             let blob;
             const ct = res.headers.get("content-type") || "";

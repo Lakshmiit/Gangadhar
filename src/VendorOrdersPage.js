@@ -18,8 +18,7 @@ import autoTable from "jspdf-autotable";
 import ImageCache from "./utils/ImageCache";
 import { getImageFilename, imageValueToUrl } from "./utils/imageSource";
 
-const API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const API_BASE = "https://localhost:7091/api";
 const GET_VENDOR_ORDERS = `${API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const UPDATE_ORDER = `${API_BASE}/Mart/UpdateProductDetails`;
 const GET_DELIVERYPARTNERS_BYVENDORID = `${API_BASE}/DeliveryPartner/GetDeliveryPartnerByVendorId`;

@@ -4,8 +4,7 @@
  * and the existing Handyman API for storing notification records.
  */
 
-const API =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const API = "https://localhost:7091/api";
 
 const PushNotificationService = {
   _onMessageCallback: null,

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./InventoryStock.css";
 
 const API_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetAllGroceryItemsForAdmin";
+  "https://localhost:7091/api/UploadGrocery/GetAllGroceryItemsForAdmin";
 
 const InventoryStock = () => {
   const [items, setItems] = useState([]);

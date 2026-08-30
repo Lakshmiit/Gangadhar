@@ -11,35 +11,6 @@ import { Button, Form, Row, Col, Modal } from "react-bootstrap";
 import axios from "axios";
 // import { appConfig } from "./config";
 
-// TODO: make sure these match the actual values/imports used elsewhere in
-// your app (same ones your decrement handler already relies on).
-const GET_VENDOR_PRODUCTS_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/GetVendorProducts";
-const UPDATE_VENDOR_PRODUCTS_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/UpdateVendorProducts";
-
-const normalizeName = (name) => (name || "").toString().trim().toLowerCase();
-
-// Builds a map of normalized product name -> { qty } from the cart/order data.
-const buildProductMapFromCart = (cartData) => {
-  const map = new Map();
-  const categories = cartData?.categories ?? [];
-  categories.forEach((cat) => {
-    (cat?.products ?? []).forEach((p) => {
-      const key = normalizeName(p?.productName);
-      const qty = Number(p?.noOfQuantity ?? p?.quantity ?? p?.qty ?? 0);
-      if (key) map.set(key, { qty });
-    });
-  });
-  return map;
-};
-
-// Simple in-memory cache invalidation hook — replace with your real cache
-// logic if you have one (e.g. clearing a React Query / SWR cache key).
-const invalidateVendorProductsCache = (vendorId) => {
-  console.log(`[vendorStock] Cache invalidated for vendor ${vendorId}`);
-};
-
 const AdminGroceryOrderPage = () => {
   const navigate = useNavigate();
   const { groceryItemId } = useParams();
@@ -146,7 +117,7 @@ const AdminGroceryOrderPage = () => {
       const ctrl = new AbortController();
       try {
         const res1 = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
           { signal: ctrl.signal },
         );
         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -179,7 +150,7 @@ const AdminGroceryOrderPage = () => {
         }
 
         const requests = productNames.map(async (name) => {
-          const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+          const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
             name,
           )}`;
           const res = await fetch(url, { signal: ctrl.signal });
@@ -221,7 +192,7 @@ const AdminGroceryOrderPage = () => {
     const fetchDeliveryPartners = async () => {
       try {
         const response = await axios.get(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/DeliveryPartner/GetAllDeliveryPartners`,
+          `https://localhost:7091/api/DeliveryPartner/GetAllDeliveryPartners`,
         );
         const partners = response.data.filter(
           (partner) => partner.status === "open",
@@ -238,7 +209,7 @@ const AdminGroceryOrderPage = () => {
     const fetchGroceryData = async () => {
       try {
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch grocery product data");
@@ -351,7 +322,7 @@ const AdminGroceryOrderPage = () => {
       };
 
       let response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: {
@@ -375,138 +346,10 @@ const AdminGroceryOrderPage = () => {
     }
   };
 
-  // 🆕 Restores vendor product stock (adds back the ordered quantities).
-  // Mirrors handleUpdateVendorProductQuantities (the decrement version),
-  // but reads vendorId from localStorage and adds quantity back instead
-  // of subtracting it.
-  const handleIncreaseVendorProductQuantities = async () => {
-    try {
-      const vendorId = localStorage.getItem("vendorId");
-      if (!vendorId) {
-        console.warn(
-          "[vendorStock] No vendorId in localStorage — skipping vendor stock restore.",
-        );
-        return;
-      }
-      if (
-        !Array.isArray(groceryData) ||
-        groceryData.length === 0 ||
-        !cartData
-      ) {
-        console.warn(
-          "[vendorStock] No order/cart data available — skipping vendor stock restore.",
-          { groceryData, cartData },
-        );
-        return;
-      }
-
-      const productMap = buildProductMapFromCart(cartData);
-      const orderedQtyById = new Map();
-      groceryData.forEach((item) => {
-        const key = normalizeName(item?._matchedProductName || item?.name);
-        const info = productMap.get(key);
-        const qty = Number(info?.qty || 0);
-        if (item?.id && qty > 0) {
-          orderedQtyById.set(String(item.id), qty);
-        }
-      });
-
-      if (orderedQtyById.size === 0) {
-        console.warn(
-          "[vendorStock] No ordered quantities resolved — skipping vendor stock restore.",
-          { groceryData, cartData },
-        );
-        return;
-      }
-
-      const res = await fetch(
-        `${GET_VENDOR_PRODUCTS_URL}?vendorId=${encodeURIComponent(vendorId)}`,
-      );
-      if (!res.ok) {
-        console.warn(
-          `[vendorStock] GET vendor products failed with HTTP ${res.status}`,
-        );
-        return;
-      }
-      const data = await res.json();
-      const vendorProducts = Array.isArray(data) ? data[0] : data;
-
-      if (!vendorProducts) {
-        console.warn(
-          "[vendorStock] No vendor products record found — skipping vendor stock restore.",
-        );
-        return;
-      }
-
-      let changed = false;
-      const categorieKey =
-        "Categorie" in vendorProducts ? "Categorie" : "categorie";
-      const updatedCategorie = (vendorProducts[categorieKey] || []).map(
-        (cat) => {
-          const productsKey = "Products" in cat ? "Products" : "products";
-          return {
-            ...cat,
-            [productsKey]: (cat[productsKey] || []).map((p) => {
-              const pid = String(p.ProductIds ?? p.productIds ?? "");
-              const orderedQty = orderedQtyById.get(pid);
-              if (!orderedQty) return p;
-              const qtyKey = "Quantity" in p ? "Quantity" : "quantity";
-              const currentQty = Number(p[qtyKey] ?? 0) || 0;
-              const newQty = currentQty + orderedQty; // add back on cancel
-              changed = true;
-              console.log(
-                `[vendorStock] ${pid}: ${currentQty} -> ${newQty} (restored ${orderedQty})`,
-              );
-              return { ...p, [qtyKey]: String(newQty) };
-            }),
-          };
-        },
-      );
-
-      if (!changed) {
-        console.warn(
-          "[vendorStock] No ProductIds in the vendor record matched the cancelled item ids — skipping restore.",
-          {
-            orderedQtyById: Array.from(orderedQtyById.entries()),
-            vendorProductIds: (vendorProducts[categorieKey] || []).flatMap(
-              (cat) =>
-                (cat.Products || cat.products || []).map(
-                  (p) => p.ProductIds ?? p.productIds,
-                ),
-            ),
-          },
-        );
-        return;
-      }
-
-      const payload = { ...vendorProducts, [categorieKey]: updatedCategorie };
-
-      const putRes = await fetch(
-        `${UPDATE_VENDOR_PRODUCTS_URL}?id=${encodeURIComponent(vendorProducts.id)}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
-      if (!putRes.ok) {
-        const msg = await putRes.text().catch(() => "");
-        throw new Error(`Failed to restore vendor product quantities: ${msg}`);
-      }
-      invalidateVendorProductsCache(vendorId);
-      console.log("✅ [vendorStock] Vendor product quantities restored.");
-    } catch (error) {
-      console.error(
-        "[vendorStock] Error restoring vendor product quantities:",
-        error,
-      );
-    }
-  };
-
   const handleCancelOrder = async () => {
     try {
       const detailsResponse = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+        `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
       );
       if (!detailsResponse.ok)
         throw new Error("Failed to fetch latest order details");
@@ -520,10 +363,12 @@ const AdminGroceryOrderPage = () => {
         DeliveryPartnerUserId: "",
         deliveryAssignedTime: "",
         deliverySubmitTime: "",
+        SlotTime: "",
+        VendorId: "",
       };
 
       const cancelResponse = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -532,11 +377,87 @@ const AdminGroceryOrderPage = () => {
       );
       if (!cancelResponse.ok) throw new Error("Failed to cancel order");
 
-      // 🆕 Restore vendor product stock (reads vendorId from localStorage).
-      // This replaces the old per-item UploadGrocery stockLeft loop as the
-      // single source of truth for stock, so we don't double-credit
-      // inventory in two different places.
-      await handleIncreaseVendorProductQuantities();
+      let allProducts = [];
+      if (latestData.categories && Array.isArray(latestData.categories)) {
+        latestData.categories.forEach((cat) => {
+          cat.products.forEach((p) => {
+            allProducts.push({
+              productName: p.productName,
+              quantity: p.noOfQuantity,
+            });
+          });
+        });
+      }
+
+      const stockUpdateResults = await Promise.allSettled(
+        allProducts.map(async ({ productName, quantity }) => {
+          const getRes = await fetch(
+            `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(productName)}`,
+          );
+          if (!getRes.ok) throw new Error(`GET failed for "${productName}"`);
+          const groceryItems = await getRes.json();
+
+          const matched = Array.isArray(groceryItems)
+            ? groceryItems.find(
+                (g) =>
+                  g.name?.trim().toLowerCase() ===
+                  productName?.trim().toLowerCase(),
+              )
+            : null;
+
+          if (!matched) {
+            console.warn(`No matching grocery item found for "${productName}"`);
+            return;
+          }
+
+          const currentStock = parseInt(matched.stockLeft) || 0;
+          const updatedStock = currentStock + parseInt(quantity);
+
+          const putPayload = {
+            id: matched.id,
+            Date: matched.date,
+            GroceryItemId: matched.groceryItemId,
+            Name: matched.name,
+            Category: matched.category,
+            Images: matched.images,
+            MRP: matched.mrp,
+            Discount: matched.discount,
+            AfterDiscount: matched.afterDiscount,
+            StockLeft: updatedStock.toString(),
+            DeliveryIn: matched.deliveryIn,
+            Status: matched.status,
+            code: matched.code,
+            units: matched.units,
+            RequestedBy: matched.requestedBy || "Admin",
+            manufactureDate: matched.manufactureDate || "",
+            expireDate: matched.expireDate || "",
+            Limit: matched.limit,
+          };
+
+          const putRes = await fetch(
+            `https://localhost:7091/api/UploadGrocery/UpdateGroceryItems?id=${matched.id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(putPayload),
+            },
+          );
+          if (!putRes.ok) throw new Error(`PUT failed for "${productName}"`);
+
+          console.log(
+            `✅ Stock restored for "${productName}": ${currentStock} + ${quantity} = ${updatedStock}`,
+          );
+        }),
+      );
+
+      stockUpdateResults.forEach((result, idx) => {
+        if (result.status === "rejected") {
+          console.error(
+            `Stock update failed for item ${idx + 1}:`,
+            result.reason,
+          );
+        }
+      });
 
       alert(
         "Order has been cancelled and stock has been restored successfully",
@@ -559,352 +480,488 @@ const AdminGroceryOrderPage = () => {
     e.preventDefault();
   };
 
-  const fmtDate = (iso) => {
-    if (!iso) return "";
-    const d = new Date(iso);
-    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-  };
-
-  const fmtDateTime = (d) => {
-    const day = String(d.getDate()).padStart(2, "0");
-    const mon = String(d.getMonth() + 1).padStart(2, "0");
-    const yr = d.getFullYear();
-    let h = d.getHours();
-    const min = String(d.getMinutes()).padStart(2, "0");
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12 || 12;
-    return `${day}/${mon}/${yr}  ${h}:${min} ${ampm}`;
-  };
-
-  const GREEN = [26, 110, 42];
-  const WHITE = [255, 255, 255];
-  const BLACK = [0, 0, 0];
-  const DARK_GRAY = [60, 60, 60];
-  const MID_GRAY = [120, 120, 120];
-  const LIGHT_BG = [245, 250, 246];
-  const RED_TEXT = [180, 0, 0];
-  const GREEN_TEXT = [26, 110, 42];
-
-  const drawPageHeader = (doc, martId) => {
-    const W = doc.internal.pageSize.width;
-
-    doc.setFillColor(...GREEN);
-    doc.rect(0, 0, W, 22, "F");
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.setTextColor(...WHITE);
-    doc.text("Lakshmi Mart", 14, 10);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text("Handyman Grocery Services", 14, 16);
-
-    doc.setFont("helvetica", "bold");
+  const addHeader = (doc, martId) => {
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont("Roboto", "bold");
+    doc.text("Handyman", 14, 12);
+    doc.text("Lakshmi Mart", 195, 12, { align: "right" });
+    doc.setLineWidth(0.5);
+    doc.line(14, 15, 195, 15);
     doc.setFontSize(11);
-    doc.text("TAX INVOICE", W - 14, 10, { align: "right" });
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text(`Order: ${martId}`, W - 14, 16, { align: "right" });
+    doc.setFont("Roboto", "bold");
+    doc.text(`Order Number: ${martId}`, 105, 22, { align: "center" });
   };
 
-  const drawPageFooter = (doc) => {
-    const W = doc.internal.pageSize.width;
-    const H = doc.internal.pageSize.height;
-
-    doc.setDrawColor(...MID_GRAY);
-    doc.setLineWidth(0.3);
-    doc.line(14, H - 14, W - 14, H - 14);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(...MID_GRAY);
+  const addFooter = (doc) => {
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setLineWidth(0.5);
+    doc.line(20, pageHeight - 15, 190, pageHeight - 15);
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "bold");
     doc.text(
-      "Support: Call / WhatsApp 6281198953  |  Mon–Sun 7:00 AM – 9:00 PM",
-      W / 2,
-      H - 8,
+      "For Support : Call / WhatsApp 6281198953 | Mon–Sun : 7:00 AM – 9:00 PM",
+      105,
+      pageHeight - 10,
       { align: "center" },
     );
   };
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF("p", "mm", "a4");
-    const PAGE_W = doc.internal.pageSize.width;
-    const PAGE_H = doc.internal.pageSize.height;
-    const FOOTER_SPACE = 16;
-    const HEADER_HEIGHT = 16;
-
-    const invNumber = (martId || "").slice(-4);
-    const invDateTime = fmtDateTime(new Date());
-    const poDate = fmtDate(date);
-    const fullAddress = [address, district, state, pincode, mobileNumber]
+    const PAGE_HEIGHT = doc.internal.pageSize.height;
+    const FOOTER_SPACE = 25;
+    const TOP_MARGIN = 30;
+    addHeader(doc, martId);
+    addFooter(doc);
+    doc.setFont("Roboto", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Customer Name: ${customerName || ""}`, 14, 28);
+    const addressText = `Customer Address: ${[
+      address,
+      district,
+      state,
+      pincode,
+      mobileNumber,
+    ]
       .filter(Boolean)
-      .join(", ");
-    const productsTotal = items.reduce((s, it) => s + Number(it.total), 0);
-    const grandTotalNum = parseFloat(grandTotal) || 0;
-    const availedNum = parseFloat(availedAmount) || 0;
-    const remainingNum = parseFloat(remainingAmount) || 0;
-    const paidNum = parseFloat(paidAmount) || 0;
+      .join(", ")}`;
 
-    drawPageHeader(doc, martId);
-    drawPageFooter(doc);
-
-    let curY = HEADER_HEIGHT + 6;
-
-    doc.setFillColor(...LIGHT_BG);
-    doc.rect(0, curY, PAGE_W, 14, "F");
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(...GREEN_TEXT);
-    const metaFields = [
-      [`Invoice No.`, `No${invNumber}`],
-      [`Invoice Date`, invDateTime],
-      [`PO No.`, martId],
-      [`PO Date`, poDate],
-      [`State of Supply`, "Andhra Pradesh"],
-    ];
-    const colW = PAGE_W / metaFields.length;
-    metaFields.forEach(([label, val], i) => {
-      const x = 14 + i * colW;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7);
-      doc.setTextColor(...MID_GRAY);
-      doc.text(label.toUpperCase(), x, curY + 4);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(...DARK_GRAY);
-      doc.text(String(val), x, curY + 10);
-    });
-    curY += 18;
-
-    const halfW = (PAGE_W - 28) / 2;
-
-    doc.setDrawColor(...MID_GRAY);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(14, curY, halfW, 18, 2, 2, "S");
-    doc.roundedRect(14 + halfW + 4, curY, halfW, 18, 2, 2, "S");
-
-    doc.setFillColor(...GREEN);
-    doc.roundedRect(14, curY, halfW, 6, 2, 2, "F");
-    doc.roundedRect(14 + halfW + 4, curY, halfW, 6, 2, 2, "F");
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...WHITE);
-    doc.text("BILLING ADDRESS", 17, curY + 4.2);
-    doc.text("SHIPPING ADDRESS", 17 + halfW + 4, curY + 4.2);
-
-    const addrLines = doc.splitTextToSize(fullAddress, halfW - 6);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.setTextColor(...DARK_GRAY);
-    doc.text((customerName || "").trim(), 17, curY + 11);
-    doc.text((customerName || "").trim(), 17 + halfW + 4, curY + 11);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...MID_GRAY);
-    doc.text(addrLines, 17, curY + 16);
-    doc.text(addrLines, 17 + halfW + 4, curY + 16);
-
-    curY += 22;
-
+    doc.text(addressText || "", 14, 32, { maxWidth: 180 });
+    doc.text(`Date: ${date ? date.split("T")[0] : ""}`, 14, 42);
     autoTable(doc, {
-      startY: curY + 2,
-      margin: { left: 8, right: 8 },
-
-      head: [["No", "Item Name", "Category", "MRP", "Qty", "Disc %", "Amount"]],
-
-      body: items.map((item, idx) => [
-        idx + 1,
-        (item.name || "").substring(0, 35),
-        (item.category || "").substring(0, 20),
-        Math.round(item.mrp),
-        item.quantity,
+      startY: 48,
+      head: [
+        [
+          "S.No",
+          "Photo",
+          "Item Name",
+          "Category",
+          "MRP",
+          "Dis (%)",
+          "Price",
+          "Qty",
+          "Total",
+        ],
+      ],
+      body: items.map((item, index) => [
+        index + 1,
+        "",
+        item.name,
+        item.category,
+        `Rs. ${Math.round(item.mrp)}`,
         `${Math.round(item.discount)}%`,
-        item.total.toFixed(0),
+        `Rs. ${Math.round(item.afterDiscountPrice)}`,
+        item.quantity,
+        `Rs. ${Math.round(item.total)}`,
       ]),
-
       styles: {
-        fontSize: 5.5,
-        cellPadding: 0.5,
-        minCellHeight: 4,
-        overflow: "hidden",
-        textColor: [60, 60, 60],
-        lineColor: [220, 220, 220],
-        lineWidth: 0.1,
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: [0, 0, 0],
       },
-
       headStyles: {
-        fillColor: [26, 110, 42],
+        fillColor: [0, 128, 0],
         textColor: [255, 255, 255],
-        fontSize: 7,
-        fontStyle: "bold",
         halign: "center",
       },
-
-      alternateRowStyles: {
-        fillColor: [248, 250, 248],
-      },
-
       columnStyles: {
-        0: { cellWidth: 8, halign: "center" },
-        1: { cellWidth: 55 },
-        2: { cellWidth: 35 },
-        3: { cellWidth: 15, halign: "right" },
-        4: { cellWidth: 10, halign: "center" },
-        5: { cellWidth: 12, halign: "center" },
-        6: { cellWidth: 20, halign: "right" },
+        0: { cellWidth: 10, halign: "center" },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 20, halign: "right" },
+        5: { cellWidth: 15, halign: "right" },
+        6: { cellWidth: 23, halign: "right" },
+        7: { cellWidth: 12, halign: "center" },
+        8: { cellWidth: 23, halign: "right" },
       },
+      didDrawCell(data) {
+        if (data.column.index === 1 && data.cell.section === "body") {
+          const item = items[data.row.index];
+          const imgData = imageUrls[item?.id];
+          if (!imgData) return;
 
+          const size = 14;
+          const x = data.cell.x + (data.cell.width - size) / 2;
+          const y = data.cell.y + (data.cell.height - size) / 2;
+
+          doc.addImage(imgData, "JPEG", x, y, size, size);
+        }
+      },
       didDrawPage() {
-        drawPageHeader(doc, martId);
-        drawPageFooter(doc);
+        addHeader(doc, martId);
+        addFooter(doc);
       },
     });
 
-    curY = doc.lastAutoTable.finalY + 4;
+    doc.setFont("Roboto", "normal");
+    doc.setTextColor(0, 0, 0);
 
-    const TOTAL_X = PAGE_W - 14 - 110;
-    const TOTAL_W = 100;
-    const LINE_H = 7;
+    let currentY = doc.lastAutoTable.finalY + 10;
 
-    const totalsRows = [
-      {
-        label: "Products total",
-        value: `Rs ${productsTotal.toFixed(2)}`,
-        bold: false,
-        color: DARK_GRAY,
-      },
-    ];
-
-    if (grandTotalNum !== productsTotal) {
-      const diff = productsTotal - grandTotalNum;
-      if (diff > 0) {
-        totalsRows.push({
-          label: "Discount",
-          value: ` Rs ${diff.toFixed(2)}`,
-          bold: false,
-          color: RED_TEXT,
-        });
-      }
-    }
-    if (availedNum > 0) {
-      totalsRows.push({
-        label: "Cashback applied",
-        value: ` Rs ${availedNum.toFixed(2)}`,
-        bold: false,
-        color: GREEN_TEXT,
-      });
-    }
-    totalsRows.push({
-      label: "Grand Total",
-      value: `Rs ${grandTotalNum.toFixed(2)}`,
-      bold: true,
-      color: BLACK,
-      divider: true,
-    });
-    totalsRows.push({
-      label: "Remaining wallet balance",
-      value: `Rs ${remainingNum.toFixed(2)}`,
-      bold: false,
-      color: MID_GRAY,
-    });
-
-    const totalsBoxH = totalsRows.length * LINE_H + 12;
-
-    const PAYMENT_BOX_H = 25;
-    const NOTE_H = 4;
-    const NEEDED = totalsBoxH + PAYMENT_BOX_H + NOTE_H + 4;
-
-    if (curY + NEEDED > PAGE_H - FOOTER_SPACE) {
+    let requiredHeight = 12;
+    if (currentY + requiredHeight > PAGE_HEIGHT - FOOTER_SPACE) {
       doc.addPage();
-      drawPageHeader(doc, martId);
-      drawPageFooter(doc);
-      curY = HEADER_HEIGHT + 10;
+      addHeader(doc, martId);
+      addFooter(doc);
+      currentY = TOP_MARGIN + 10;
     }
-
-    doc.setDrawColor(...MID_GRAY);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(TOTAL_X, curY, TOTAL_W, totalsBoxH, 2, 2, "S");
-
-    doc.setFillColor(...GREEN);
-    doc.roundedRect(TOTAL_X, curY, TOTAL_W, 7, 2, 2, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...WHITE);
-    doc.text("ORDER SUMMARY", TOTAL_X + 4, curY + 4.8);
-
-    let rowY = curY + 12;
-    totalsRows.forEach((row) => {
-      if (row.divider) {
-        doc.setDrawColor(...GREEN);
-        doc.setLineWidth(0.4);
-        doc.line(TOTAL_X + 3, rowY - 2, TOTAL_X + TOTAL_W - 3, rowY - 2);
-        rowY += 1;
-      }
-      doc.setFont("helvetica", row.bold ? "bold" : "normal");
-      doc.setFontSize(row.bold ? 9 : 8);
-      doc.setTextColor(...row.color);
-      doc.text(row.label, TOTAL_X + 4, rowY);
-      doc.text(row.value, TOTAL_X + TOTAL_W - 4, rowY, { align: "right" });
-      rowY += LINE_H;
+    doc.setFont("Roboto", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(200, 0, 0);
+    doc.text(`Cashback Earned : Rs. ${availedAmount}`, 195, currentY, {
+      align: "right",
     });
 
-    curY += totalsBoxH + 8;
-
-    doc.setDrawColor(...MID_GRAY);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(TOTAL_X, curY, TOTAL_W, PAYMENT_BOX_H, 2, 2, "S");
-
-    doc.setFillColor(...LIGHT_BG);
-    doc.roundedRect(TOTAL_X, curY, TOTAL_W, 7, 2, 2, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(...GREEN_TEXT);
-    doc.text("PAYMENT DETAILS", TOTAL_X + 4, curY + 4.8);
-
-    const payRows = [
-      {
-        label: "Amount paid",
-        value: `Rs ${paidNum.toFixed(2)}`,
-        color: GREEN_TEXT,
-      },
-      {
-        label: "Payment mode",
-        value: String(paymentMode || "—").toUpperCase(),
-        color: DARK_GRAY,
-      },
-    ];
-
-    let pRowY = curY + 13;
-    payRows.forEach((row) => {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
-      doc.setTextColor(...row.color);
-      doc.text(row.label, TOTAL_X + 4, pRowY);
-      doc.text(row.value, TOTAL_X + TOTAL_W - 4, pRowY, { align: "right" });
-      pRowY += 8;
+    currentY += 6;
+    doc.text(`Grand Total : Rs. ${grandTotal}`, 195, currentY, {
+      align: "right",
     });
-
-    curY += PAYMENT_BOX_H + 6;
-
-    doc.setFillColor(253, 247, 238);
-    doc.roundedRect(14, curY, PAGE_W - 28, NOTE_H, 2, 2, "F");
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(7.5);
-    doc.setTextColor("red");
+    currentY += 6;
     doc.text(
-      "Note: For every Rs 100 order value, Rs 10 will be used from wallet on next order.",
-      PAGE_W / 2,
-      curY + 5.5,
-      { align: "center" },
+      `Remaining Wallet Balance : Rs. ${remainingAmount}`,
+      195,
+      currentY,
+      { align: "right" },
     );
 
-    doc.save(`Invoice_${martId}.pdf`);
+    currentY += 6;
+
+    doc.setFontSize(10);
+    doc.setTextColor(200, 0, 0);
+
+    doc.text(
+      "For every Rs.100 order value, Rs.10 will be used from wallet on next order.",
+      105,
+      currentY,
+      { align: "center" },
+    );
+    doc.save(`Grocery_Order_${martId}.pdf`);
   };
+
+  // const fmtDate = (iso) => {
+  //   if (!iso) return "";
+  //   const d = new Date(iso);
+  //   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  // };
+
+  // const fmtDateTime = (d) => {
+  //   const day = String(d.getDate()).padStart(2, "0");
+  //   const mon = String(d.getMonth() + 1).padStart(2, "0");
+  //   const yr = d.getFullYear();
+  //   let h = d.getHours();
+  //   const min = String(d.getMinutes()).padStart(2, "0");
+  //   const ampm = h >= 12 ? "PM" : "AM";
+  //   h = h % 12 || 12;
+  //   return `${day}/${mon}/${yr}  ${h}:${min} ${ampm}`;
+  // };
+
+  // const GREEN     = [26, 110, 42];
+  // const WHITE     = [255, 255, 255];
+  // const BLACK     = [0, 0, 0];
+  // const DARK_GRAY = [60, 60, 60];
+  // const MID_GRAY  = [120, 120, 120];
+  // const LIGHT_BG  = [245, 250, 246];
+  // const RED_TEXT  = [180, 0, 0];
+  // const GREEN_TEXT= [26, 110, 42];
+
+  // const drawPageHeader = (doc, martId) => {
+  //   const W = doc.internal.pageSize.width;
+
+  //   doc.setFillColor(...GREEN);
+  //   doc.rect(0, 0, W, 22, "F");
+
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(14);
+  //   doc.setTextColor(...WHITE);
+  //   doc.text("Lakshmi Mart", 14, 10);
+
+  //   doc.setFont("helvetica", "normal");
+  //   doc.setFontSize(8);
+  //   doc.text("Handyman Grocery Services", 14, 16);
+
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(11);
+  //   doc.text("TAX INVOICE", W - 14, 10, { align: "right" });
+
+  //   doc.setFont("helvetica", "normal");
+  //   doc.setFontSize(8);
+  //   doc.text(`Order: ${martId}`, W - 14, 16, { align: "right" });
+  // };
+
+  // const drawPageFooter = (doc) => {
+  //   const W = doc.internal.pageSize.width;
+  //   const H = doc.internal.pageSize.height;
+
+  //   doc.setDrawColor(...MID_GRAY);
+  //   doc.setLineWidth(0.3);
+  //   doc.line(14, H - 14, W - 14, H - 14);
+
+  //   doc.setFont("helvetica", "normal");
+  //   doc.setFontSize(8);
+  //   doc.setTextColor(...MID_GRAY);
+  //   doc.text(
+  //     "Support: Call / WhatsApp 6281198953  |  Mon–Sun 7:00 AM – 9:00 PM",
+  //     W / 2,
+  //     H - 8,
+  //     { align: "center" }
+  //   );
+  // };
+
+  // const handleDownloadPDF = () => {
+  //   const doc = new jsPDF("p", "mm", "a4");
+  //   const PAGE_W  = doc.internal.pageSize.width;
+  //   const PAGE_H  = doc.internal.pageSize.height;
+  //   const FOOTER_SPACE = 16;
+  //   const HEADER_HEIGHT = 16;
+
+  //   const invNumber   = (martId || "").slice(-4);
+  //   const invDateTime = fmtDateTime(new Date());
+  //   const poDate      = fmtDate(date);
+  //   const fullAddress = [address, district, state, pincode, mobileNumber]
+  //     .filter(Boolean)
+  //     .join(", ");
+  //   const productsTotal = items.reduce((s, it) => s + Number(it.total), 0);
+  //   const grandTotalNum = parseFloat(grandTotal) || 0;
+  //   const availedNum    = parseFloat(availedAmount) || 0;
+  //   const remainingNum  = parseFloat(remainingAmount) || 0;
+  //   const paidNum       = parseFloat(paidAmount) || 0;
+
+  //   drawPageHeader(doc, martId);
+  //   drawPageFooter(doc);
+
+  //   let curY = HEADER_HEIGHT + 6;
+
+  //   doc.setFillColor(...LIGHT_BG);
+  //   doc.rect(0, curY, PAGE_W, 14, "F");
+
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(8);
+  //   doc.setTextColor(...GREEN_TEXT);
+  //   const metaFields = [
+  //     [`Invoice No.`, `No${invNumber}`],
+  //     [`Invoice Date`, invDateTime],
+  //     [`PO No.`,       martId],
+  //     [`PO Date`,      poDate],
+  //     [`State of Supply`, "Andhra Pradesh"],
+  //   ];
+  //   const colW = PAGE_W / metaFields.length;
+  //   metaFields.forEach(([label, val], i) => {
+  //     const x = 14 + i * colW;
+  //     doc.setFont("helvetica", "normal");
+  //     doc.setFontSize(7);
+  //     doc.setTextColor(...MID_GRAY);
+  //     doc.text(label.toUpperCase(), x, curY + 4);
+  //     doc.setFont("helvetica", "bold");
+  //     doc.setFontSize(8);
+  //     doc.setTextColor(...DARK_GRAY);
+  //     doc.text(String(val), x, curY + 10);
+  //   });
+  //   curY += 18;
+
+  //   const halfW = (PAGE_W - 28) / 2;
+
+  //   doc.setDrawColor(...MID_GRAY);
+  //   doc.setLineWidth(0.3);
+  //   doc.roundedRect(14, curY, halfW, 18, 2, 2, "S");
+  //   doc.roundedRect(14 + halfW + 4, curY, halfW, 18, 2, 2, "S");
+
+  //   doc.setFillColor(...GREEN);
+  //   doc.roundedRect(14, curY, halfW, 6, 2, 2, "F");
+  //   doc.roundedRect(14 + halfW + 4, curY, halfW, 6, 2, 2, "F");
+
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(7.5);
+  //   doc.setTextColor(...WHITE);
+  //   doc.text("BILLING ADDRESS", 17, curY + 4.2);
+  //   doc.text("SHIPPING ADDRESS", 17 + halfW + 4, curY + 4.2);
+
+  //   const addrLines = doc.splitTextToSize(fullAddress, halfW - 6);
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(8.5);
+  //   doc.setTextColor(...DARK_GRAY);
+  //   doc.text((customerName || "").trim(), 17, curY + 11);
+  //   doc.text((customerName || "").trim(), 17 + halfW + 4, curY + 11);
+
+  //   doc.setFont("helvetica", "normal");
+  //   doc.setFontSize(7.5);
+  //   doc.setTextColor(...MID_GRAY);
+  //   doc.text(addrLines, 17, curY + 16);
+  //   doc.text(addrLines, 17 + halfW + 4, curY + 16);
+
+  //   curY += 22;
+
+  //   autoTable(doc, {
+  //   startY: curY + 2,
+  //   margin: { left: 8, right: 8 },
+
+  //   head: [[
+  //     "No",
+  //     "Item Name",
+  //     "Category",
+  //     "MRP",
+  //     "Qty",
+  //     "Disc %",
+  //     "Amount"
+  //   ]],
+
+  //   body: items.map((item, idx) => [
+  //     idx + 1,
+  //     (item.name || "").substring(0, 35),
+  //     (item.category || "").substring(0, 20),
+  //     Math.round(item.mrp),
+  //     item.quantity,
+  //     `${Math.round(item.discount)}%`,
+  //     item.total.toFixed(0),
+  //   ]),
+
+  //   styles: {
+  //   fontSize: 5.5,
+  //   cellPadding: 0.5,
+  //   minCellHeight: 4,
+  //   overflow: "hidden",
+  //   textColor: [60, 60, 60],
+  //   lineColor: [220, 220, 220],
+  //   lineWidth: 0.1,
+  // },
+
+  //   headStyles: {
+  //     fillColor: [26, 110, 42],
+  //     textColor: [255, 255, 255],
+  //     fontSize: 7,
+  //     fontStyle: "bold",
+  //     halign: "center",
+  //   },
+
+  //   alternateRowStyles: {
+  //     fillColor: [248, 250, 248],
+  //   },
+
+  //   columnStyles: {
+  //   0: { cellWidth: 8, halign: "center" },
+  //   1: { cellWidth: 55 },
+  //   2: { cellWidth: 35 },
+  //   3: { cellWidth: 15, halign: "right" },
+  //   4: { cellWidth: 10, halign: "center" },
+  //   5: { cellWidth: 12, halign: "center" },
+  //   6: { cellWidth: 20, halign: "right" },
+  // },
+
+  //   didDrawPage() {
+  //     drawPageHeader(doc, martId);
+  //     drawPageFooter(doc);
+  //   }
+  // });
+
+  //   curY = doc.lastAutoTable.finalY + 4;
+
+  //   const TOTAL_X    = PAGE_W - 14 - 110;
+  //   const TOTAL_W    = 100;
+  //   const LINE_H     = 7;
+
+  //   const totalsRows = [
+  //     { label: "Products total",          value: `Rs ${productsTotal.toFixed(2)}`,    bold: false, color: DARK_GRAY },
+  //   ];
+
+  //   if (grandTotalNum !== productsTotal) {
+  //     const diff = productsTotal - grandTotalNum;
+  //     if (diff > 0) {
+  //       totalsRows.push({ label: "Discount", value: ` Rs ${diff.toFixed(2)}`, bold: false, color: RED_TEXT });
+  //     }
+  //   }
+  //   if (availedNum > 0) {
+  //     totalsRows.push({ label: "Cashback applied",          value: ` Rs ${availedNum.toFixed(2)}`,    bold: false, color: GREEN_TEXT });
+  //   }
+  //   totalsRows.push(   { label: "Grand Total",             value: `Rs ${grandTotalNum.toFixed(2)}`,   bold: true,  color: BLACK,      divider: true });
+  //   totalsRows.push(   { label: "Remaining wallet balance",value: `Rs ${remainingNum.toFixed(2)}`,    bold: false, color: MID_GRAY });
+
+  //   const totalsBoxH = totalsRows.length * LINE_H + 12;
+
+  //   const PAYMENT_BOX_H = 25;
+  //   const NOTE_H = 4;
+  //   const NEEDED = totalsBoxH + PAYMENT_BOX_H + NOTE_H + 4;
+
+  //   if (curY + NEEDED > PAGE_H - FOOTER_SPACE) {
+  //     doc.addPage();
+  //     drawPageHeader(doc, martId);
+  //     drawPageFooter(doc);
+  //     curY = HEADER_HEIGHT + 10;
+  //   }
+
+  //   doc.setDrawColor(...MID_GRAY);
+  //   doc.setLineWidth(0.3);
+  //   doc.roundedRect(TOTAL_X, curY, TOTAL_W, totalsBoxH, 2, 2, "S");
+
+  //   doc.setFillColor(...GREEN);
+  //   doc.roundedRect(TOTAL_X, curY, TOTAL_W, 7, 2, 2, "F");
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(7.5);
+  //   doc.setTextColor(...WHITE);
+  //   doc.text("ORDER SUMMARY", TOTAL_X + 4, curY + 4.8);
+
+  //   let rowY = curY + 12;
+  //   totalsRows.forEach((row) => {
+  //     if (row.divider) {
+  //       doc.setDrawColor(...GREEN);
+  //       doc.setLineWidth(0.4);
+  //       doc.line(TOTAL_X + 3, rowY - 2, TOTAL_X + TOTAL_W - 3, rowY - 2);
+  //       rowY += 1;
+  //     }
+  //     doc.setFont("helvetica", row.bold ? "bold" : "normal");
+  //     doc.setFontSize(row.bold ? 9 : 8);
+  //     doc.setTextColor(...row.color);
+  //     doc.text(row.label, TOTAL_X + 4, rowY);
+  //     doc.text(row.value, TOTAL_X + TOTAL_W - 4, rowY, { align: "right" });
+  //     rowY += LINE_H;
+  //   });
+
+  //   curY += totalsBoxH + 8;
+
+  //   doc.setDrawColor(...MID_GRAY);
+  //   doc.setLineWidth(0.3);
+  //   doc.roundedRect(TOTAL_X, curY, TOTAL_W, PAYMENT_BOX_H, 2, 2, "S");
+
+  //   doc.setFillColor(...LIGHT_BG);
+  //   doc.roundedRect(TOTAL_X, curY, TOTAL_W, 7, 2, 2, "F");
+  //   doc.setFont("helvetica", "bold");
+  //   doc.setFontSize(7.5);
+  //   doc.setTextColor(...GREEN_TEXT);
+  //   doc.text("PAYMENT DETAILS", TOTAL_X + 4, curY + 4.8);
+
+  //   const payRows = [
+  //     { label: "Amount paid",   value: `Rs ${paidNum.toFixed(2)}`,   color: GREEN_TEXT },
+  //     { label: "Payment mode",  value: String(paymentMode || "—").toUpperCase(), color: DARK_GRAY },
+  //   ];
+
+  //   let pRowY = curY + 13;
+  //   payRows.forEach((row) => {
+  //     doc.setFont("helvetica", "bold");
+  //     doc.setFontSize(8.5);
+  //     doc.setTextColor(...row.color);
+  //     doc.text(row.label, TOTAL_X + 4, pRowY);
+  //     doc.text(row.value, TOTAL_X + TOTAL_W - 4, pRowY, { align: "right" });
+  //     pRowY += 8;
+  //   });
+
+  //   curY += PAYMENT_BOX_H + 6;
+
+  //   doc.setFillColor(253, 247, 238);
+  //   doc.roundedRect(14, curY, PAGE_W - 28, NOTE_H, 2, 2, "F");
+  //   doc.setFont("helvetica", "italic");
+  //   doc.setFontSize(7.5);
+  //   doc.setTextColor("red");
+  //   doc.text(
+  //     "Note: For every Rs 100 order value, Rs 10 will be used from wallet on next order.",
+  //     PAGE_W / 2,
+  //     curY + 5.5,
+  //     { align: "center" }
+  //   );
+
+  //   doc.save(`Invoice_${martId}.pdf`);
+  // };
 
   useEffect(() => {
     if (!items.length) return;
@@ -917,7 +974,7 @@ const AdminGroceryOrderPage = () => {
           if (!item.image) return;
           try {
             const res = await fetch(
-              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+              `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(
                 item.image,
               )}`,
               { signal: controller.signal },
@@ -959,6 +1016,30 @@ const AdminGroceryOrderPage = () => {
         className="d-flex flex-row justify-content-start align-items-start"
         style={{ marginTop: "130px" }}
       >
+        {/* Sidebar menu for Larger Screens */}
+        {/* {!isMobile && (
+        <div className=" ml-0 p-0 adm_mnu h-90">
+          <AdminSidebar />
+        </div>
+      )} */}
+
+        {/* {isMobile && (
+        <div className="floating-menu">
+          <Button
+            variant="primary"
+            className="rounded-circle shadow"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <MoreVertIcon />
+          </Button>
+          {showMenu && (
+            <div className="sidebar-container">
+              <AdminSidebar />
+            </div>
+          )}
+        </div>
+      )} */}
+
         {/* Main Content */}
         <div className={`container ${isMobile ? "w-100" : "w-75"}`}>
           <h3 className="text-center">Grocery Items Orders</h3>
@@ -1168,7 +1249,52 @@ const AdminGroceryOrderPage = () => {
                 </Col>
               </Row>
 
+              {/* <div className='payment'>
+        <label className='fw-bold fs-5 w-100 p-2' style={{ background: "green", color: "white", borderRadius: "15px", width: "25px" }}>Payment Mode</label>
+        <label className='fs-5 '>
+            <input 
+            type="radio" 
+            className="form-check-input border-secondary m-2 border-dark"
+            checked={paymentMode === 'online'}
+            readOnly
+             />
+            Pay Through Online
+          </label>
+          <label className='fs-5'>
+            <input 
+            type="radio" 
+            className="form-check-input border-secondary border-dark m-2"
+            checked={paymentMode === 'cash'}
+            readOnly
+            />
+            Cash On Delivery
+          </label>
+    </div>  */}
+
+              {/* <div className="form-group mt-0">
+              <label>Payment Transaction Details </label>
+              <input
+                type="text"
+                className="form-control "
+                value={transactionDetails}
+                onChange={(e) => setTransactionDetails(e.target.value)}
+                placeholder="Payment Transaction Details"
+                readOnly
+              />
+            </div> */}
               <Row>
+                {/* Assigned To
+                  <Col md={12}>
+                    <Form.Group>
+                      <label>Assigned To</label>
+                      <Form.Control as="select" value={assignedTo} onChange={handleAssignedToChange} required>
+                        <option value="">Select Assigned</option>
+                        <option value="Delivery Partner">Delivery Partner</option>
+                      </Form.Control>
+                      {error.assignedTo && <p className="text-danger">{error.assignedTo}</p>}
+                    </Form.Group>
+                  </Col> */}
+
                 {/* New Delivery Partner Names Dropdown */}
                 <Col md={12}>
                   <Form.Group>

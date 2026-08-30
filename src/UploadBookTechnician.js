@@ -93,7 +93,7 @@ const UploadBookTechnician = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/CreateUploadJobDescriptionBookTechnician`,
+        `https://localhost:7091/api/UploadJobDescriptionBookTechnician/CreateUploadJobDescriptionBookTechnician`,
         {
           method: "POST",
           headers: {

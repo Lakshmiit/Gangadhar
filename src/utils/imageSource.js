@@ -1,5 +1,5 @@
 export const IMAGE_DOWNLOAD_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=";
+  "https://localhost:7091/api/FileUpload/download?generatedfilename=";
 
 const isDirectUrl = (value) => /^(?:https?:|data:|blob:)/i.test(value);
 

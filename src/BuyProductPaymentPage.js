@@ -96,7 +96,7 @@ const BuyProductPaymentPage = () => {
     const fetchProductData = async () => {
       try {
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsById/${buyProductId}`,
+          `https://localhost:7091/api/BuyProduct/GetBuyProductDetailsById/${buyProductId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch product data");
@@ -139,7 +139,7 @@ const BuyProductPaymentPage = () => {
       try {
         setLoading(true);
         const productResponse = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
+          `https://localhost:7091/api/Product/${id}`,
         );
         if (!productResponse.ok) {
           throw new Error("Product not found");
@@ -269,7 +269,7 @@ const BuyProductPaymentPage = () => {
       let response;
       if (selectedPayment === "online") {
         response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/${buyProductId}`,
+          `https://localhost:7091/api/BuyProduct/${buyProductId}`,
           {
             method: "PUT",
             headers: {
@@ -291,7 +291,7 @@ const BuyProductPaymentPage = () => {
         window.location.href = `/buyProductOnlinePaymentPage/${buyProductId}`;
       } else if (selectedPayment === "technician") {
         response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/${buyProductId}`,
+          `https://localhost:7091/api/BuyProduct/${buyProductId}`,
           {
             method: "PUT",
             headers: {
@@ -352,7 +352,7 @@ const BuyProductPaymentPage = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${uniqueId}`,
+        `https://localhost:7091/api/Product/${uniqueId}`,
         {
           method: "PUT",
           headers: {

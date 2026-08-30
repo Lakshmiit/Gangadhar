@@ -51,7 +51,7 @@ const AdminLakshmiCollectionsPage = () => {
   const downloadImage = async (fileName) => {
     if (!fileName) return null;
     const res = await fetch(
-      `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+      `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(
         fileName,
       )}`,
     );
@@ -88,7 +88,7 @@ const AdminLakshmiCollectionsPage = () => {
         }
         setImageLoading(true);
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmicollectionsById?id=${collectionId}`,
+          `https://localhost:7091/api/LakshmiCollection/GetLakshmicollectionsById?id=${collectionId}`,
         );
         if (!response.ok) throw new Error("Failed to fetch collection details");
         const data = await response.json();

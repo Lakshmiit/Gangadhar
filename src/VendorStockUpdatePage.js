@@ -9,32 +9,27 @@ import Inventory2Icon from "@mui/icons-material/Inventory2";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import SearchIcon from "@mui/icons-material/Search";
-import DownloadIcon from "@mui/icons-material/Download";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import * as XLSX from "xlsx";
 import {
   getVendorProfileById,
   updateVendorProfile,
 } from "./utils/vendorStorage";
 import ImageCache from "./utils/ImageCache";
-import { getGroceryItems, getLiveGroceryStock } from "./utils/groceryStore";
-import { getVendorProductsByVendorId } from "./utils/vendorListStore";
+import { getGroceryItems } from "./utils/groceryStore";
+
 // Same backend the customer-facing Profile page (and Admin grocery pages) use.
-const API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const API_BASE = "https://localhost:7091/api";
 const ADD_GROCERY_ITEM = `${API_BASE}/UploadGrocery/UploadGrocery`;
 const IMAGE_DOWNLOAD = `${API_BASE}/FileUpload/download?generatedfilename=`;
 const IMAGE_UPLOAD = `${API_BASE}/FileUpload/upload?filename=`;
+// Called directly here (bypassing utils/vendorListStore.js's cached
+// normalizeVendor) so the limit-binding logic below is guaranteed to be
+// the code actually running, regardless of any stale build/cache
+// upstream. Same endpoint vendorListStore.js points at.
+const GET_VENDOR_PRODUCTS_BY_VENDOR_ID = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
 
 // Same key VendorPreviewPage reads to show the "ready to submit" list —
 // keep this string identical in both files.
 const pendingCartKey = (vendorId) => `vendorPendingProducts_${vendorId}`;
-
-// Category display-order key — same key VendorPreviewPage reads to seed
-// its #1/#2/... rank order. Writing to it here means the order categories
-// were SELECTED in on this page carries straight over as the initial
-// preview order — check "Unbeatable Offers" first and it lands as #1.
-const categoryOrderKey = (vendorId) => `vendorCategoryOrder_${vendorId}`;
 
 const BARCODE_FORMATS = [
   "ean_13",
@@ -88,26 +83,66 @@ const normalizeItem = (p) => ({
   afterDiscount: Number(p.afterDiscount || 0),
 });
 
-// getVendorProductsByVendorId() (utils/vendorListStore.js) already
-// normalizes the backend's vendor-submission record to
-// { categories: [{ category, products: [{ productId, discount, qty, limit }] }] }.
-// Turn that into the same { [productId]: {checked, discount} } / qty / limit
-// maps shape the localStorage hydration effect below produces, so both
-// sources can be merged the same way.
-const extractSelectionFromVendorProducts = (vendorProducts) => {
+// Reads the RAW response from GetVendorProductsvalues directly — this page
+// now fetches that endpoint itself (see fetchVendorProductsDirect below)
+// instead of going through utils/vendorListStore.js's normalizeVendor, so
+// there's no intermediate caching/normalization layer that could still be
+// running stale code. Handles both a bare vendor object and an array
+// containing one (some backends wrap a single result in an array).
+// Field names match the confirmed live response exactly:
+// { categorie: [{ categoryName, products: [{ productIds, quantity, limit, discount }] }] }
+// but also tolerates the capitalized variants (Categorie/Products/
+// ProductIds/Quantity/Limit/Discount) just in case the API casing ever
+// changes. This is what feeds `pendingLimit`, which the "Per-customer
+// limit" input below reads via getPendingLimit().
+const extractSelectionFromVendorProducts = (vendorProductsRaw) => {
   const map = {};
   const qtyMap = {};
   const limitMap = {};
+
+  const vendorProducts = Array.isArray(vendorProductsRaw)
+    ? vendorProductsRaw[0]
+    : vendorProductsRaw;
+
   if (!vendorProducts) return { map, qtyMap, limitMap };
-  (vendorProducts.categories || []).forEach((cat) => {
-    (cat.products || []).forEach((p) => {
-      if (!p?.productId || !(p.qty > 0)) return;
-      map[p.productId] = { checked: true, discount: String(p.discount ?? "0") };
-      qtyMap[p.productId] = p.qty;
-      limitMap[p.productId] = Number(p.limit ?? 0);
+
+  const categories =
+    vendorProducts.categorie ||
+    vendorProducts.categories ||
+    vendorProducts.Categorie ||
+    [];
+
+  categories.forEach((cat) => {
+    const products = cat.products || cat.Products || [];
+    products.forEach((p) => {
+      const productId = p.productIds ?? p.productId ?? p.ProductIds;
+      const qty = p.quantity ?? p.qty ?? p.Quantity;
+      const discount = p.discount ?? p.Discount;
+      const limit = p.limit ?? p.Limit;
+
+      if (!productId || !(Number(qty) > 0)) return;
+
+      map[productId] = { checked: true, discount: String(discount ?? "0") };
+      qtyMap[productId] = Number(qty);
+      limitMap[productId] = Number(limit ?? 0);
     });
   });
+
   return { map, qtyMap, limitMap };
+};
+
+// Direct fetch, bypassing utils/vendorListStore.js's cache/normalizeVendor
+// layer entirely — this guarantees the code above is what actually runs
+// against the real response, independent of any stale cached bundle,
+// sessionStorage entry, or service worker elsewhere in the app.
+const fetchVendorProductsDirect = async (vendorId) => {
+  const res = await fetch(
+    `${GET_VENDOR_PRODUCTS_BY_VENDOR_ID}?vendorId=${encodeURIComponent(vendorId)}`,
+  );
+  if (res.status === 404) return null; // no submission yet — not an error
+  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  const data = await res.json();
+  return data;
 };
 
 const EMPTY_ADD_FORM = {
@@ -133,28 +168,17 @@ const VendorStockUpdatePage = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [pendingLimit, setPendingLimit] = useState({});
 
   // null = show categories only. Set to a category name (or "All") to view products.
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  // Search box on the categories-only landing view — filters the category
-  // tiles themselves (not products), separate from `searchQuery` above
-  // which filters products once a category has been opened.
-  const [categorySearchQuery, setCategorySearchQuery] = useState("");
 
   // Locally tracked submission quantities — start at 0. As soon as a
   // product's quantity goes above 0 it's automatically added to the
   // submit-for-approval payload; dropping it back to 0 automatically
   // removes it again. No separate "save" step needed.
   const [pendingQty, setPendingQty] = useState({});
-
-  // Locally tracked per-customer purchase limit for each product — same
-  // "+/- stepper, defaults from the catalog value, capped by live stock"
-  // pattern as pendingQty, but it doesn't gate selection on its own: a
-  // product only goes into the payload once pendingQty > 0, and the limit
-  // just rides along with it.
-  const [pendingLimit, setPendingLimit] = useState({});
-
   const [showVendorMenu, setShowVendorMenu] = useState(false);
 
   // ---- Edit vendor info modal state ----
@@ -172,36 +196,19 @@ const VendorStockUpdatePage = () => {
   const [codeMode, setCodeMode] = useState("manual"); // "manual" | "scan"
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState("");
-  const [checkingStockId, setCheckingStockId] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanFrameRef = useRef(null);
-  // ---- Bulk Excel upload/download ----
-  const excelInputRef = useRef(null);
-  const [excelBusy, setExcelBusy] = useState(false);
+
   // ---- Fast selection for the vendor's own submission ----
   // itemId -> { checked: bool, discount: string }. `checked` always mirrors
-  // whether pendingQty[itemId] > 0 — the +/- stepper (or its checkbox
+  // whether pendingQty[itemId] > 0 — typing a quantity (or its checkbox
   // shortcut) is what adds/removes a product here, never a separate action.
   // This auto-saves to localStorage in the vendorUploadProducts payload
   // shape; VendorPreviewPage reads that cart back for a final review + submit.
   const [selection, setSelection] = useState({});
   const hydratedSelectionRef = useRef(false);
   const hydratedBackendRef = useRef(false);
-
-  // Order categories were SELECTED in on this page — a list of category
-  // names, front = first category that got a product checked. Seeded from
-  // whatever's already saved (a previous visit here, or arrows used on the
-  // Preview page), then kept in sync below. VendorPreviewPage reads this
-  // exact key to seed its own #1/#2/... rank order.
-  const [categorySelectOrder, setCategorySelectOrder] = useState(() => {
-    try {
-      const raw = localStorage.getItem(categoryOrderKey(vendorId));
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
 
   // Vendor session check.
   useEffect(() => {
@@ -294,14 +301,22 @@ const VendorStockUpdatePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vendor]);
 
+  // ---- Hydrate from the backend's already-submitted record (if any) ----
   useEffect(() => {
     if (!vendor || hydratedBackendRef.current) return;
     hydratedBackendRef.current = true;
     (async () => {
       try {
-        const vendorProducts = await getVendorProductsByVendorId(vendorId);
+        const vendorProducts = await fetchVendorProductsDirect(vendorId);
+
+        console.log(
+          "RAW response from GetVendorProductsvalues:",
+          JSON.stringify(vendorProducts, null, 2),
+        );
+
         const { map, qtyMap, limitMap } =
           extractSelectionFromVendorProducts(vendorProducts);
+
         if (Object.keys(map).length)
           setSelection((prev) => ({ ...map, ...prev }));
         if (Object.keys(qtyMap).length)
@@ -454,61 +469,6 @@ const VendorStockUpdatePage = () => {
     return unique;
   }, [items]);
 
-  // Categories filtered by the landing-view search box. "All Products" is
-  // always shown unless the vendor is actively searching for something
-  // that doesn't match "all" — that keeps the tile from disappearing on
-  // an empty query while still letting a real search hide it if unrelated.
-  const filteredCategories = useMemo(() => {
-    const q = categorySearchQuery.trim().toLowerCase();
-    if (!q) return categories;
-    return categories.filter((c) => c.toLowerCase().includes(q));
-  }, [categories, categorySearchQuery]);
-
-  const showAllProductsTile =
-    !categorySearchQuery.trim() ||
-    "all products".includes(categorySearchQuery.trim().toLowerCase());
-
-  // Whenever the set of "categories with at least one selected product"
-  // changes, keep categorySelectOrder in sync: categories that dropped to
-  // zero selected products are removed, and any newly-active category is
-  // appended at the end — so the FIRST category you check ends up first,
-  // the next NEW one you check ends up second, etc. Persisted under the
-  // exact key VendorPreviewPage reads its initial rank order from.
-  useEffect(() => {
-    if (!vendor) return;
-    const activeCategories = new Set();
-    items.forEach((it) => {
-      if (Number(pendingQty[it.id] || 0) > 0) {
-        activeCategories.add(it.category || "Unspecified");
-      }
-    });
-    setCategorySelectOrder((prev) => {
-      const kept = prev.filter((c) => activeCategories.has(c));
-      const known = new Set(kept);
-      const next = [...kept];
-      categories.forEach((c) => {
-        if (activeCategories.has(c) && !known.has(c)) {
-          next.push(c);
-          known.add(c);
-        }
-      });
-      const changed =
-        next.length !== prev.length || next.some((c, i) => c !== prev[i]);
-      if (changed) {
-        try {
-          localStorage.setItem(
-            categoryOrderKey(vendorId),
-            JSON.stringify(next),
-          );
-        } catch (err) {
-          // storage full/unavailable — order still works for this session
-        }
-        return next;
-      }
-      return prev;
-    });
-  }, [items, pendingQty, vendor, vendorId, categories]);
-
   const displayedItems = useMemo(() => {
     if (!selectedCategory) return [];
     let list =
@@ -551,7 +511,8 @@ const VendorStockUpdatePage = () => {
 
   // Quantity is the single source of truth for "is this product going into
   // the submission payload". Bumping it above 0 auto-selects the product;
-  // dropping it back to 0 auto-removes it — no separate save step.
+  // dropping it back to 0 auto-removes it — no separate save step. Used by
+  // the checkbox shortcut (toggleSelectForSubmission / toggleCategorySelection).
   const handlePendingChange = (itemId, delta, item) => {
     setPendingQty((prev) => {
       const next = Math.max(0, Number(prev[itemId] || 0) + delta);
@@ -579,121 +540,18 @@ const VendorStockUpdatePage = () => {
   const getSelectionDiscount = (item) =>
     selection[item.id]?.discount ?? String(item.discount ?? 0);
 
-  // Per-customer limit — same "+/- stepper" pattern as the quantity
-  // stepper, capped by the item's own live stock (a limit above the
-  // available stock doesn't mean anything). Defaults from the catalog's
-  // own `limit` value the first time a product is touched.
   const getPendingLimit = (item) =>
     Number(pendingLimit[item.id] ?? item.limit ?? 0);
 
-  const handleLimitChange = (itemId, delta, item) => {
-    setPendingLimit((prev) => {
-      const base = prev[itemId] ?? item.limit ?? 0;
-      const liveStock = Number(item.stockLeft || 0);
-      const next = Math.max(0, Math.min(Number(base) + delta, liveStock));
-      return { ...prev, [itemId]: next };
-    });
-  };
-
-  const refreshSingleProductStock = async (itemId) => {
-    try {
-      // Direct API request - NO CACHE
-      const latest = await getLiveGroceryStock(itemId);
-
-      // Update only this product in the UI
-      setItems((prev) =>
-        prev.map((p) =>
-          String(p.id) === String(itemId)
-            ? {
-                ...p,
-                ...latest,
-                stockLeft: Number(latest.stockLeft || 0),
-              }
-            : p,
-        ),
-      );
-
-      return latest;
-    } catch (error) {
-      console.error("Failed to get live stock for product:", itemId, error);
-
-      return null;
-    }
-  };
-
   // Checkbox shortcut: checking a product jumps its quantity straight to 1
   // (adding it to the payload); unchecking zeroes the quantity back out
-  // (removing it) — same rule the +/- stepper follows.
-  const toggleSelectForSubmission = async (item) => {
+  // (removing it).
+  const toggleSelectForSubmission = (item) => {
     const current = getPendingQty(item.id);
-
-    // If already selected → simply unselect
     if (current > 0) {
       handlePendingChange(item.id, -current, item);
-      return;
-    }
-
-    // -------------------------------
-    // NEW SELECTION
-    // FIRST CHECK LIVE SERVER STOCK
-    // -------------------------------
-
-    setCheckingStockId(item.id);
-
-    try {
-      const latest = await refreshSingleProductStock(item.id);
-
-      if (!latest) {
-        alert("Unable to check live stock. Please try again.");
-        return;
-      }
-
-      const liveStock = Number(latest.stockLeft || 0);
-
-      console.log(`Product: ${latest.name} | Live Stock: ${liveStock}`);
-
-      if (liveStock <= 0) {
-        alert(`"${latest.name}" is currently out of stock.`);
-
-        // Make sure selection remains removed
-        setPendingQty((prev) => {
-          const next = { ...prev };
-          delete next[item.id];
-          return next;
-        });
-
-        setSelection((prev) => {
-          const next = { ...prev };
-          delete next[item.id];
-          return next;
-        });
-
-        return;
-      }
-
-      // -------------------------------
-      // SERVER CONFIRMED STOCK > 0
-      // NOW SELECT THE PRODUCT
-      // -------------------------------
-
-      handlePendingChange(item.id, liveStock, latest);
-
-      // Seed a starting limit the first time this product is selected,
-      // capped by the live stock we just confirmed. Leaves any value the
-      // vendor already set (e.g. restored from localStorage) untouched.
-      setPendingLimit((prev) =>
-        prev[item.id] !== undefined
-          ? prev
-          : {
-              ...prev,
-              [item.id]: Math.min(
-                Number(latest.limit ?? item.limit ?? 0),
-                liveStock,
-              ),
-            },
-      );
-    } finally {
-      setCheckingStockId(null);
+    } else {
+      handlePendingChange(item.id, 1, item);
     }
   };
 
@@ -705,39 +563,52 @@ const VendorStockUpdatePage = () => {
 
   const isCategorySelected = (category) => {
     const categoryItems = getCategoryItems(category);
+    if (categoryItems.length === 0) return false;
+    return categoryItems.every((item) => Number(pendingQty[item.id] || 0) > 0);
+  };
 
-    // Consider only products that have stock
-    const availableItems = categoryItems.filter(
-      (item) => Number(item.stockLeft || 0) > 0,
-    );
+  // ---- Direct-typing handlers for the plain number inputs ----
+  const handleQtyInputChange = (itemId, rawValue, item) => {
+    const next = Math.max(0, Number(rawValue) || 0);
+    setPendingQty((prev) => ({ ...prev, [itemId]: next }));
+    setSelection((prevSel) => {
+      if (next > 0) {
+        const current = prevSel[itemId];
+        return {
+          ...prevSel,
+          [itemId]: {
+            checked: true,
+            discount: current?.discount ?? String(item?.discount ?? 0),
+          },
+        };
+      }
+      if (!prevSel[itemId]) return prevSel;
+      const nextSel = { ...prevSel };
+      delete nextSel[itemId];
+      return nextSel;
+    });
+  };
 
-    if (availableItems.length === 0) return false;
-
-    return availableItems.every((item) => Number(pendingQty[item.id] || 0) > 0);
+  const handleLimitInputChange = (itemId, rawValue, item) => {
+    const liveStock = Number(item.stockLeft || 0);
+    const next = Math.max(0, Math.min(Number(rawValue) || 0, liveStock));
+    setPendingLimit((prev) => ({ ...prev, [itemId]: next }));
   };
 
   const toggleCategorySelection = (category) => {
     const categoryItems = getCategoryItems(category);
-
     const shouldSelect = !isCategorySelected(category);
 
     setPendingQty((prevQty) => {
       const nextQty = { ...prevQty };
-
       categoryItems.forEach((item) => {
-        // Match the per-product flow (toggleSelectForSubmission): selecting
-        // a product defaults its submit quantity to the item's own
-        // available stock, not a hardcoded 1. An item with 0 stock stays
-        // at 0 either way, so it never gets selected by accident.
-        nextQty[item.id] = shouldSelect ? Number(item.stockLeft || 0) : 0;
+        nextQty[item.id] = shouldSelect ? 1 : 0;
       });
-
       return nextQty;
     });
 
     setSelection((prevSelection) => {
       const nextSelection = { ...prevSelection };
-
       categoryItems.forEach((item) => {
         if (shouldSelect) {
           nextSelection[item.id] = {
@@ -750,24 +621,7 @@ const VendorStockUpdatePage = () => {
           delete nextSelection[item.id];
         }
       });
-
       return nextSelection;
-    });
-
-    // Seed a starting limit (capped by live stock) for any product in the
-    // category that doesn't already have one — same rule as the single-item
-    // select flow. Left untouched on deselect.
-    setPendingLimit((prevLimit) => {
-      const nextLimit = { ...prevLimit };
-      if (shouldSelect) {
-        categoryItems.forEach((item) => {
-          if (nextLimit[item.id] === undefined) {
-            const liveStock = Number(item.stockLeft || 0);
-            nextLimit[item.id] = Math.min(Number(item.limit || 0), liveStock);
-          }
-        });
-      }
-      return nextLimit;
     });
   };
 
@@ -803,10 +657,7 @@ const VendorStockUpdatePage = () => {
   };
 
   const handleBackToProfile = () => {
-    // Sent here from the customer ProfilePage (which stashes where to
-    // return to). Falls back to the app root if that's missing.
-    const returnTo = localStorage.getItem("vendorReturnProfile");
-    navigate(returnTo || "/");
+    navigate(`/profilePage/customer/${vendorId}`);
   };
 
   const handleCategorySelect = (category) => {
@@ -817,172 +668,6 @@ const VendorStockUpdatePage = () => {
         localStorage.setItem(key, JSON.stringify([...previous, category]));
     }
     setSelectedCategory(category);
-  };
-
-  // ---- Bulk Excel upload/download ----
-  // Download: a spreadsheet of the vendor's full product catalog, with the
-  // vendor's current "qty to sell / discount / limit" selections filled
-  // in where set, so it doubles as an editable snapshot. Upload: read that
-  // same file back (edited or not) and bulk-apply qty/discount/limit for
-  // every row that matches a catalog product — same net effect as using
-  // the +/- steppers and discount boxes one product at a time, just all
-  // at once. Makes it easy for the vendor admin to manage a large catalog
-  // outside the browser (in Excel) instead of product-by-product.
-  const handleDownloadProductsExcel = () => {
-    if (!items.length) {
-      setError("No products loaded yet — refresh the catalog first.");
-      return;
-    }
-    const rows = items.map((item) => ({
-      "Product ID": item.id,
-      "Product Code": item.code || "",
-      "Product Name": item.name || "",
-      Category: item.category || "Unspecified",
-      MRP: Number(item.mrp || 0),
-      "Live Stock": Number(item.stockLeft || 0),
-      "Qty To Sell": getPendingQty(item.id) || "",
-      "Discount %": getSelectionDiscount(item),
-      "Limit Per Customer": getPendingLimit(item) || "",
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    worksheet["!cols"] = [
-      { wch: 12 },
-      { wch: 16 },
-      { wch: 32 },
-      { wch: 20 },
-      { wch: 10 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 18 },
-    ];
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
-    const safeStoreName = (vendor?.storeName || vendor?.name || "vendor")
-      .toString()
-      .replace(/[^a-z0-9]+/gi, "_");
-    const fileName = `${safeStoreName}_products_${new Date()
-      .toISOString()
-      .slice(0, 10)}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-    setShowVendorMenu(false);
-  };
-
-  const handleUploadProductsExcelClick = () => {
-    setShowVendorMenu(false);
-    excelInputRef.current?.click();
-  };
-
-  const handleProductsExcelFileSelected = async (event) => {
-    const file = event.target.files?.[0];
-    // Allow re-selecting the same file again later.
-    event.target.value = "";
-    if (!file) return;
-
-    setExcelBusy(true);
-    setError("");
-    setMessage("");
-    try {
-      const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer, { type: "array" });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
-
-      if (!rows.length) {
-        setError("That Excel file doesn't have any product rows in it.");
-        return;
-      }
-
-      const itemsById = new Map(items.map((it) => [String(it.id), it]));
-      const itemsByCode = new Map(
-        items
-          .filter((it) => it.code)
-          .map((it) => [String(it.code).trim().toLowerCase(), it]),
-      );
-      const itemsByName = new Map(
-        items.map((it) => [
-          String(it.name || "")
-            .trim()
-            .toLowerCase(),
-          it,
-        ]),
-      );
-
-      let updatedCount = 0;
-      let skippedCount = 0;
-
-      rows.forEach((row) => {
-        const rawId = row["Product ID"] ?? row["ProductId"] ?? row["id"];
-        const rawCode = row["Product Code"] ?? row["Code"];
-        const rawName = row["Product Name"] ?? row["Name"];
-
-        const item =
-          (rawId !== undefined &&
-            rawId !== "" &&
-            itemsById.get(String(rawId))) ||
-          (rawCode && itemsByCode.get(String(rawCode).trim().toLowerCase())) ||
-          (rawName && itemsByName.get(String(rawName).trim().toLowerCase()));
-
-        if (!item) {
-          skippedCount += 1;
-          return;
-        }
-
-        const qty =
-          Math.max(
-            0,
-            Number(row["Qty To Sell"] ?? row["Qty"] ?? row["Quantity"] ?? 0),
-          ) || 0;
-        const discountRaw = row["Discount %"] ?? row["Discount"];
-        const limitRaw = row["Limit Per Customer"] ?? row["Limit"];
-
-        setPendingQty((prev) => ({ ...prev, [item.id]: qty }));
-
-        setSelection((prev) => {
-          if (qty <= 0) {
-            if (!prev[item.id]) return prev;
-            const next = { ...prev };
-            delete next[item.id];
-            return next;
-          }
-          return {
-            ...prev,
-            [item.id]: {
-              checked: true,
-              discount:
-                discountRaw !== undefined && discountRaw !== ""
-                  ? String(discountRaw)
-                  : (prev[item.id]?.discount ?? String(item.discount ?? 0)),
-            },
-          };
-        });
-
-        if (limitRaw !== undefined && limitRaw !== "") {
-          const liveStock = Number(item.stockLeft || 0);
-          const limitVal = Math.max(
-            0,
-            Math.min(Number(limitRaw) || 0, liveStock),
-          );
-          setPendingLimit((prev) => ({ ...prev, [item.id]: limitVal }));
-        }
-
-        updatedCount += 1;
-      });
-
-      setMessage(
-        `Excel import complete: ${updatedCount} product${updatedCount === 1 ? "" : "s"} updated` +
-          (skippedCount
-            ? `, ${skippedCount} row${skippedCount === 1 ? "" : "s"} skipped (no matching product).`
-            : "."),
-      );
-    } catch (err) {
-      console.error("Failed to read products Excel file:", err);
-      setError(
-        "Couldn't read that Excel file. Make sure it's a .xlsx or .xls file (ideally one downloaded from this page).",
-      );
-    } finally {
-      setExcelBusy(false);
-    }
   };
 
   // ---- Barcode scanning ----
@@ -1193,13 +878,13 @@ const VendorStockUpdatePage = () => {
   return (
     <div className="vsu-page" style={{ position: "relative" }}>
       <div className="container py-4">
-        {/* Back to Profile */}
+        {/* Back to Preview */}
         <button
           type="button"
           className="vsu-back-btn mb-3"
-          onClick={handleBackToProfile}
+          onClick={handlePreview}
         >
-          <ArrowBackIcon fontSize="small" /> Back to Profile
+          <ArrowBackIcon fontSize="small" /> Back to Preview
         </button>
 
         {/* Header */}
@@ -1432,25 +1117,10 @@ const VendorStockUpdatePage = () => {
         {/* ---- Categories-only landing view ---- */}
         {!selectedCategory ? (
           <div className="mb-4">
-            <div className="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
-              <div>
-                <h3 className="vsu-section-heading mb-1">Choose a category</h3>
-                <p className="text-muted mb-0">
-                  Select a category to view and restock its products.
-                </p>
-              </div>
-              <div className="vsu-search-wrap">
-                <SearchIcon className="vsu-search-icon" />
-                <input
-                  type="text"
-                  className="form-control form-control-sm vsu-search"
-                  placeholder="Search categories..."
-                  value={categorySearchQuery}
-                  onChange={(e) => setCategorySearchQuery(e.target.value)}
-                  style={{ maxWidth: "220px" }}
-                />
-              </div>
-            </div>
+            <h3 className="vsu-section-heading mb-1">Choose a category</h3>
+            <p className="text-muted mb-3">
+              Select a category to view and restock its products.
+            </p>
 
             {loading ? (
               <div className="vsu-empty">
@@ -1468,37 +1138,28 @@ const VendorStockUpdatePage = () => {
                   Add your first product to start building out your catalog.
                 </p>
               </div>
-            ) : !showAllProductsTile && filteredCategories.length === 0 ? (
-              <div className="vsu-empty">
-                <p className="mb-1 fw-bold">
-                  No categories match "{categorySearchQuery}"
-                </p>
-                <p className="mb-0">Try a different search term.</p>
-              </div>
             ) : (
               <div className="d-flex flex-wrap gap-3">
-                {showAllProductsTile && (
+                <div
+                  className="vsu-cat-tile"
+                  onClick={() => handleCategorySelect("All")}
+                >
                   <div
-                    className="vsu-cat-tile"
-                    onClick={() => handleCategorySelect("All")}
-                  >
-                    <div
-                      className="vsu-cat-ribbon"
-                      style={{ background: "#16311F" }}
+                    className="vsu-cat-ribbon"
+                    style={{ background: "#16311F" }}
+                  />
+                  <div className="vsu-cat-body">
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={getCategoryImage("All")}
+                      alt="All"
+                      className="vsu-cat-img"
                     />
-                    <div className="vsu-cat-body">
-                      <img
-                        loading="lazy"
-                        decoding="async"
-                        src={getCategoryImage("All")}
-                        alt="All"
-                        className="vsu-cat-img"
-                      />
-                      <span className="vsu-cat-label">All Products</span>
-                    </div>
+                    <span className="vsu-cat-label">All Products</span>
                   </div>
-                )}
-                {filteredCategories.map((category) => (
+                </div>
+                {categories.map((category) => (
                   <div
                     key={category}
                     className="vsu-cat-tile position-relative"
@@ -1633,7 +1294,6 @@ const VendorStockUpdatePage = () => {
                           className="form-check-input m-0"
                           style={{ width: "14px", height: "14px" }}
                           checked={isSelectedForSubmission(item.id)}
-                          disabled={checkingStockId === item.id}
                           onChange={() => toggleSelectForSubmission(item)}
                         />
                       </label>
@@ -1701,126 +1361,37 @@ const VendorStockUpdatePage = () => {
                         )}
                       </div>
 
-                      {/* ---- Submit quantity stepper (existing stock UI) ---- */}
+                      {/* ---- Submit quantity ---- */}
                       <div className="mt-2">
                         <div
                           className="d-flex justify-content-between align-items-center mb-1"
-                          style={{
-                            fontSize: "10px",
-                            color: "#6B7A70",
-                          }}
+                          style={{ fontSize: "10px", color: "#6B7A70" }}
                         >
-                          <span>
-                            {checkingStockId === item.id
-                              ? "Checking live stock..."
-                              : `Available Stock: ${liveStock}`}
-                          </span>
-
+                          <span>Live: {liveStock}</span>
                           <span
                             className="fw-bold"
                             style={{ color: "#8a611c" }}
                           >
-                            Submit Qty
+                            Restock
                           </span>
                         </div>
-
-                        <div className="d-flex align-items-center justify-content-between vsu-restock-pill">
-                          {/* MINUS */}
-                          <button
-                            type="button"
-                            className="vsu-restock-btn"
-                            style={{
-                              opacity: restockQty > 0 ? 1 : 0.4,
-                              cursor:
-                                restockQty > 0 ? "pointer" : "not-allowed",
-                            }}
-                            onClick={() =>
-                              restockQty > 0 &&
-                              handlePendingChange(item.id, -1, item)
-                            }
-                            disabled={
-                              restockQty <= 0 || checkingStockId === item.id
-                            }
-                            title="Decrease quantity"
-                          >
-                            –
-                          </button>
-
-                          {/* QUANTITY */}
-                          <span
-                            className="fw-bold"
-                            style={{
-                              fontSize: "13px",
-                              minWidth: "30px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {liveStock}
-                          </span>
-
-                          {/* PLUS */}
-                          <button
-                            type="button"
-                            className="vsu-restock-btn"
-                            onClick={() => {
-                              if (restockQty < liveStock) {
-                                handlePendingChange(item.id, liveStock, item);
-                              }
-                            }}
-                            disabled={
-                              checkingStockId === item.id ||
-                              restockQty >= liveStock ||
-                              liveStock <= 0
-                            }
-                            title={
-                              restockQty >= liveStock
-                                ? `Maximum quantity is ${liveStock}`
-                                : "Increase quantity"
-                            }
-                            style={{
-                              opacity:
-                                checkingStockId === item.id ||
-                                restockQty >= liveStock ||
-                                liveStock <= 0
-                                  ? 0.4
-                                  : 1,
-                              cursor:
-                                checkingStockId === item.id ||
-                                restockQty >= liveStock ||
-                                liveStock <= 0
-                                  ? "not-allowed"
-                                  : "pointer",
-                            }}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        {/* MAXIMUM MESSAGE */}
-                        {liveStock > 0 && restockQty >= liveStock && (
-                          <div
-                            style={{
-                              fontSize: "9px",
-                              color: "#dc3545",
-                              fontWeight: "600",
-                              textAlign: "center",
-                              marginTop: "3px",
-                            }}
-                          >
-                            Maximum quantity reached
-                          </div>
-                        )}
+                        <input
+                          type="number"
+                          min="0"
+                          className="form-control form-control-sm"
+                          style={{ fontSize: "12px" }}
+                          value={restockQty === 0 ? "" : restockQty}
+                          onChange={(e) =>
+                            handleQtyInputChange(item.id, e.target.value, item)
+                          }
+                        />
                       </div>
 
-                      {/* ---- Per-customer limit stepper (same UI/logic as
-                           the quantity stepper above, capped by live stock) ---- */}
+                      {/* ---- Per-customer limit ---- */}
                       <div className="mt-2">
                         <div
                           className="d-flex justify-content-between align-items-center mb-1"
-                          style={{
-                            fontSize: "10px",
-                            color: "#6B7A70",
-                          }}
+                          style={{ fontSize: "10px", color: "#6B7A70" }}
                         >
                           <span>Per-customer limit</span>
                           <span
@@ -1831,84 +1402,40 @@ const VendorStockUpdatePage = () => {
                           </span>
                         </div>
 
-                        <div className="d-flex align-items-center justify-content-between vsu-restock-pill">
-                          {/* MINUS */}
-                          <button
-                            type="button"
-                            className="vsu-restock-btn"
-                            style={{
-                              opacity: restockLimit > 0 ? 1 : 0.4,
-                              cursor:
-                                restockLimit > 0 ? "pointer" : "not-allowed",
-                            }}
-                            onClick={() =>
-                              restockLimit > 0 &&
-                              handleLimitChange(item.id, -1, item)
-                            }
-                            disabled={restockLimit <= 0}
-                            title="Decrease limit"
-                          >
-                            –
-                          </button>
+                        <input
+                          type="number"
+                          min="0"
+                          max={liveStock}
+                          className="form-control form-control-sm"
+                          style={{ fontSize: "12px" }}
+                          value={restockLimit === 0 ? "" : restockLimit}
+                          onChange={(e) =>
+                            handleLimitInputChange(
+                              item.id,
+                              e.target.value,
+                              item,
+                            )
+                          }
+                        />
 
-                          {/* LIMIT */}
-                          <span
-                            className="fw-bold"
-                            style={{
-                              fontSize: "13px",
-                              minWidth: "30px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {restockLimit}
-                          </span>
-
-                          {/* PLUS */}
-                          <button
-                            type="button"
-                            className="vsu-restock-btn"
-                            onClick={() =>
-                              restockLimit < liveStock &&
-                              handleLimitChange(item.id, 1, item)
-                            }
-                            disabled={
-                              restockLimit >= liveStock || liveStock <= 0
-                            }
-                            title={
-                              restockLimit >= liveStock
-                                ? `Maximum limit is ${liveStock}`
-                                : "Increase limit"
-                            }
-                            style={{
-                              opacity:
-                                restockLimit >= liveStock || liveStock <= 0
-                                  ? 0.4
-                                  : 1,
-                              cursor:
-                                restockLimit >= liveStock || liveStock <= 0
-                                  ? "not-allowed"
-                                  : "pointer",
-                            }}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        {liveStock > 0 && restockLimit >= liveStock && (
-                          <div
-                            style={{
-                              fontSize: "9px",
-                              color: "#dc3545",
-                              fontWeight: "600",
-                              textAlign: "center",
-                              marginTop: "3px",
-                            }}
-                          >
-                            Maximum limit reached
-                          </div>
-                        )}
+                        {liveStock > 0 &&
+                          Number(restockLimit) >= liveStock &&
+                          restockLimit !== "" && (
+                            <div
+                              style={{
+                                fontSize: "9px",
+                                color: "#dc3545",
+                                fontWeight: 600,
+                                textAlign: "center",
+                                marginTop: 3,
+                              }}
+                            >
+                              Maximum limit reached
+                            </div>
+                          )}
                       </div>
 
+                      {/* ---- Submit discount ---- */}
                       <div className="mt-2">
                         <div
                           className="d-flex justify-content-between align-items-center mb-1"
@@ -1954,15 +1481,6 @@ const VendorStockUpdatePage = () => {
         )}
       </div>
 
-      {/* Hidden input backing the "Upload Products Excel" menu item above */}
-      <input
-        ref={excelInputRef}
-        type="file"
-        accept=".xlsx,.xls"
-        style={{ display: "none" }}
-        onChange={handleProductsExcelFileSelected}
-      />
-
       {/* ---- Floating vendor icon navigation ---- */}
       <div
         style={{
@@ -1982,20 +1500,6 @@ const VendorStockUpdatePage = () => {
               onClick={openAddModal}
             >
               <AddIcon fontSize="small" /> Add New Product
-            </button>
-            <button
-              className="vsu-fab-menu-item w-100 mb-1"
-              onClick={handleDownloadProductsExcel}
-            >
-              <DownloadIcon fontSize="small" /> Download Products Excel
-            </button>
-            <button
-              className="vsu-fab-menu-item w-100 mb-1"
-              onClick={handleUploadProductsExcelClick}
-              disabled={excelBusy}
-            >
-              <UploadFileIcon fontSize="small" />{" "}
-              {excelBusy ? "Importing..." : "Upload Products Excel"}
             </button>
             <button
               className="vsu-fab-menu-item w-100 mb-1"

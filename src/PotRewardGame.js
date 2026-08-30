@@ -6,8 +6,7 @@ import { showToast } from "./toast";
 // API URLS
 // ======================================================
 
-const API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const API_BASE = "https://localhost:7091/api";
 
 const GET_OFFER_TRANSACTION_URL = `${API_BASE}/OffersTransactions/GetOfferTransactionByUserId`;
 
@@ -461,13 +460,13 @@ const PotRewardGame = ({ userId, onWalletCredited }) => {
           padding: "12px 16px",
           background: "linear-gradient(135deg,#ff9800,#ff5722)",
           color: "#fff",
-          fontWeight: "800",
+          fontWeight: "700",
           fontSize: "15px",
           cursor: "pointer",
           boxShadow: "0 5px 15px rgba(0,0,0,.18)",
         }}
       >
-        🏺 Daily Pot Reward Game Hurry Up!
+        🏺 Break your Lucky Pot Discover your Cashback Reward!
       </button>
 
       {/* ==================================================
@@ -522,14 +521,14 @@ const PotRewardGame = ({ userId, onWalletCredited }) => {
               onClick={() => setShowPopup(false)}
               style={{
                 position: "absolute",
-                top: "10px",
-                right: "10px",
+                top: "12px",
+                right: "12px",
                 width: "34px",
                 height: "34px",
                 borderRadius: "50%",
                 border: "none",
-                background: "#f1f1f1",
-                fontSize: "22px",
+                background: "#D10000",
+                fontSize: "20px",
                 cursor:
                   crediting || crackingId !== null ? "not-allowed" : "pointer",
               }}
@@ -555,7 +554,7 @@ const PotRewardGame = ({ userId, onWalletCredited }) => {
                 color: "#7a4e00",
               }}
             >
-              Break the Pot!
+              Tap Now Try your Luck!
             </h3>
 
             <p

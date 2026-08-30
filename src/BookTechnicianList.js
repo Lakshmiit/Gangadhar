@@ -24,7 +24,7 @@ const BookTechnicianList = () => {
   // Fetch product data, categories, and catalogues
   useEffect(() => {
     setLoading(true);
-    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/GetUploadJobDescriptionDetails`;
+    const url = `https://localhost:7091/api/UploadJobDescriptionBookTechnician/GetUploadJobDescriptionDetails`;
     axios
       .get(url)
       .then((response) => {
@@ -75,7 +75,7 @@ const BookTechnicianList = () => {
     if (confirmDelete) {
       axios
         .delete(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/${technicianId}`,
+          `https://localhost:7091/api/UploadJobDescriptionBookTechnician/${technicianId}`,
         )
         .then(() => {
           setTechnicianData((prevData) =>

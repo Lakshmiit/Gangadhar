@@ -1,7 +1,7 @@
 // import axios from "axios";
 
 // // Same backend every other page in the app talks to.
-// const API_BASE = "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+// const API_BASE = "https://localhost:7091/api";
 // const GET_ALL_VENDORS = `${API_BASE}/VendorRegistration/GetAllVendors`;
 // const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
 // const UPDATE_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/UpdateVendorProductsValues`;
@@ -155,10 +155,11 @@
 import axios from "axios";
 
 // Same backend every other page in the app talks to.
-const API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
+const API_BASE = "https://localhost:7091/api";
 const GET_ALL_VENDORS = `${API_BASE}/VendorRegistration/GetAllVendors`;
 const GET_VENDOR_DETAILS_BY_VENDOR_ID = `${API_BASE}/VendorRegistration/GetVendorDetailsByVendorId`;
+//const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
+
 const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
 const UPDATE_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/UpdateVendorProductsValues`;
 const GET_ALL_DELIVERY_PARTNERS = `${API_BASE}/DeliveryPartner/GetAllDeliveryPartners`;

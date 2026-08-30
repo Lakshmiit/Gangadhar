@@ -6,39 +6,8 @@ import Footer from "./Footer.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
-import ForwardIcon from "@mui/icons-material/Forward";
-import { Button, Form, Row, Col, Modal } from "react-bootstrap";
-import axios from "axios";
-// import { appConfig } from "./config";
-
-// TODO: make sure these match the actual values/imports used elsewhere in
-// your app (same ones your decrement handler already relies on).
-const GET_VENDOR_PRODUCTS_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/GetVendorProducts";
-const UPDATE_VENDOR_PRODUCTS_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Vendor/UpdateVendorProducts";
-
-const normalizeName = (name) => (name || "").toString().trim().toLowerCase();
-
-// Builds a map of normalized product name -> { qty } from the cart/order data.
-const buildProductMapFromCart = (cartData) => {
-  const map = new Map();
-  const categories = cartData?.categories ?? [];
-  categories.forEach((cat) => {
-    (cat?.products ?? []).forEach((p) => {
-      const key = normalizeName(p?.productName);
-      const qty = Number(p?.noOfQuantity ?? p?.quantity ?? p?.qty ?? 0);
-      if (key) map.set(key, { qty });
-    });
-  });
-  return map;
-};
-
-// Simple in-memory cache invalidation hook — replace with your real cache
-// logic if you have one (e.g. clearing a React Query / SWR cache key).
-const invalidateVendorProductsCache = (vendorId) => {
-  console.log(`[vendorStock] Cache invalidated for vendor ${vendorId}`);
-};
+// import ForwardIcon from "@mui/icons-material/Forward";
+import { Button, Row, Col, Modal } from "react-bootstrap";
 
 const AdminOrderClose = () => {
   const navigate = useNavigate();
@@ -54,14 +23,12 @@ const AdminOrderClose = () => {
   const [id, setId] = useState("");
   const [loading, setLoading] = useState(true);
   const [paymentMode, setPaymentMode] = useState("");
-  const [transactionDetails, setTransactionDetails] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [date, setDate] = useState("");
   const [items, setItems] = useState([]);
-  const [deliveryPartners, setDeliveryPartners] = useState([]);
-  const [selectedPartner, setSelectedPartner] = useState("");
+  const [selectedPartner] = useState("");
   const [longitude, setLongitude] = useState("");
   const [latitude, setLatitude] = useState("");
   const [grandTotal, setGrandTotal] = useState("");
@@ -80,19 +47,8 @@ const AdminOrderClose = () => {
   const [zoomImage, setZoomImage] = useState("");
   const [zoomProduct, setZoomProduct] = useState(null);
   const [availedAmount, setAvailedAmount] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
-
-  const timeSlots = [
-    "7:00 AM - 9:00 AM",
-    "9:00 AM - 11:00 AM",
-    "11:00 AM - 1:00 PM",
-    "1:00 PM - 2:00 PM",
-    "2:00 PM - 4:00 PM",
-    "4:00 PM - 6:00 PM",
-    "6:00 PM - 8:00 PM",
-    "8:00 PM - 10:00 PM",
-  ];
+  const [selectedDate] = useState("");
+  const [selectedTimeSlot] = useState("");
 
   const deliveryDateTime =
     selectedDate && selectedTimeSlot
@@ -146,7 +102,7 @@ const AdminOrderClose = () => {
       const ctrl = new AbortController();
       try {
         const res1 = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
           { signal: ctrl.signal },
         );
         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -179,7 +135,7 @@ const AdminOrderClose = () => {
         }
 
         const requests = productNames.map(async (name) => {
-          const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+          const url = `https://localhost:7091/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
             name,
           )}`;
           const res = await fetch(url, { signal: ctrl.signal });
@@ -218,27 +174,10 @@ const AdminOrderClose = () => {
   }, [groceryItemId]);
 
   useEffect(() => {
-    const fetchDeliveryPartners = async () => {
-      try {
-        const response = await axios.get(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/DeliveryPartner/GetAllDeliveryPartners`,
-        );
-        const partners = response.data.filter(
-          (partner) => partner.status === "open",
-        );
-        setDeliveryPartners(partners);
-      } catch (error) {
-        console.error("Error fetching delivery partners:", error);
-      }
-    };
-    fetchDeliveryPartners();
-  }, []);
-
-  useEffect(() => {
     const fetchGroceryData = async () => {
       try {
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch grocery product data");
@@ -256,7 +195,6 @@ const AdminOrderClose = () => {
         setDistrict(data.district);
         setPincode(data.zipCode);
         setPaymentMode(data.paymentMode);
-        setTransactionDetails(data.utrTransactionNumber);
         setLongitude(data.longitude);
         setLatitude(data.latitude);
         setGrandTotal(data.grandTotal);
@@ -311,204 +249,16 @@ const AdminOrderClose = () => {
   // const handleAssignedToChange = (e) => {
   //   const selectedAssignedTo = e.target.value;
   //   setAssignedTo(selectedAssignedTo);
-  // };
-
-  // ForwardIcon
-  const handleUpdatePaymentMethod = async () => {
-    try {
-      const partner = deliveryPartners.find(
-        (p) => p.deliveryPartnerId === selectedPartner,
-      );
-      const payload = {
-        ...cartData,
-        customerName: customerName,
-        address: address,
-        state: state,
-        district: district,
-        zipCode: pincode,
-        customerPhoneNumber: mobileNumber,
-        id: groceryItemId,
-        userId: customerId,
-        martId: martId,
-        date: date,
-        grandTotal: grandTotal,
-        totalItemsSelected: totalItemsSelected,
-        status: "In Progress",
-        paymentMode: paymentMode,
-        utrTransactionNumber: transactionDetails,
-        transactionNumber: transactionNumber,
-        transactionStatus: transactionStatus,
-        paidAmount: paidAmount,
-        AssignedTo: partner ? partner.deliveryPartnerName : "",
-        DeliveryPartnerUserId: partner ? partner.userId : "",
-        deliveryAssignedTime: new Date().toISOString(),
-        deliverySubmitTime: "",
-        latitude: latitude,
-        longitude: longitude,
-        code: code,
-        units: units,
-        slotTime: `${selectedDate} ${selectedTimeSlot}`,
-      };
-
-      let response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        },
-      );
-      if (!response.ok) {
-        throw new Error("Failed to Update Delivery Partner.");
-      }
-      alert(
-        `Ticket has been assigned to ${partner ? partner.deliveryPartnerName : ""}`,
-      );
-      //navigate(`/adminGroceryZoneDashboard`);
-
-      navigate(`/adminOrderCloseDashboard`);
-    } catch (error) {
-      console.error("Error:", error);
-      window.alert(
-        "Failed to Update Delivery Partner. Please try again later.",
-      );
-    }
-  };
 
   // 🆕 Restores vendor product stock (adds back the ordered quantities).
   // Mirrors handleUpdateVendorProductQuantities (the decrement version),
   // but reads vendorId from localStorage and adds quantity back instead
   // of subtracting it.
-  const handleIncreaseVendorProductQuantities = async () => {
-    try {
-      const vendorId = localStorage.getItem("vendorId");
-      if (!vendorId) {
-        console.warn(
-          "[vendorStock] No vendorId in localStorage — skipping vendor stock restore.",
-        );
-        return;
-      }
-      if (
-        !Array.isArray(groceryData) ||
-        groceryData.length === 0 ||
-        !cartData
-      ) {
-        console.warn(
-          "[vendorStock] No order/cart data available — skipping vendor stock restore.",
-          { groceryData, cartData },
-        );
-        return;
-      }
-
-      const productMap = buildProductMapFromCart(cartData);
-      const orderedQtyById = new Map();
-      groceryData.forEach((item) => {
-        const key = normalizeName(item?._matchedProductName || item?.name);
-        const info = productMap.get(key);
-        const qty = Number(info?.qty || 0);
-        if (item?.id && qty > 0) {
-          orderedQtyById.set(String(item.id), qty);
-        }
-      });
-
-      if (orderedQtyById.size === 0) {
-        console.warn(
-          "[vendorStock] No ordered quantities resolved — skipping vendor stock restore.",
-          { groceryData, cartData },
-        );
-        return;
-      }
-
-      const res = await fetch(
-        `${GET_VENDOR_PRODUCTS_URL}?vendorId=${encodeURIComponent(vendorId)}`,
-      );
-      if (!res.ok) {
-        console.warn(
-          `[vendorStock] GET vendor products failed with HTTP ${res.status}`,
-        );
-        return;
-      }
-      const data = await res.json();
-      const vendorProducts = Array.isArray(data) ? data[0] : data;
-
-      if (!vendorProducts) {
-        console.warn(
-          "[vendorStock] No vendor products record found — skipping vendor stock restore.",
-        );
-        return;
-      }
-
-      let changed = false;
-      const categorieKey =
-        "Categorie" in vendorProducts ? "Categorie" : "categorie";
-      const updatedCategorie = (vendorProducts[categorieKey] || []).map(
-        (cat) => {
-          const productsKey = "Products" in cat ? "Products" : "products";
-          return {
-            ...cat,
-            [productsKey]: (cat[productsKey] || []).map((p) => {
-              const pid = String(p.ProductIds ?? p.productIds ?? "");
-              const orderedQty = orderedQtyById.get(pid);
-              if (!orderedQty) return p;
-              const qtyKey = "Quantity" in p ? "Quantity" : "quantity";
-              const currentQty = Number(p[qtyKey] ?? 0) || 0;
-              const newQty = currentQty + orderedQty; // add back on cancel
-              changed = true;
-              console.log(
-                `[vendorStock] ${pid}: ${currentQty} -> ${newQty} (restored ${orderedQty})`,
-              );
-              return { ...p, [qtyKey]: String(newQty) };
-            }),
-          };
-        },
-      );
-
-      if (!changed) {
-        console.warn(
-          "[vendorStock] No ProductIds in the vendor record matched the cancelled item ids — skipping restore.",
-          {
-            orderedQtyById: Array.from(orderedQtyById.entries()),
-            vendorProductIds: (vendorProducts[categorieKey] || []).flatMap(
-              (cat) =>
-                (cat.Products || cat.products || []).map(
-                  (p) => p.ProductIds ?? p.productIds,
-                ),
-            ),
-          },
-        );
-        return;
-      }
-
-      const payload = { ...vendorProducts, [categorieKey]: updatedCategorie };
-
-      const putRes = await fetch(
-        `${UPDATE_VENDOR_PRODUCTS_URL}?id=${encodeURIComponent(vendorProducts.id)}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
-      if (!putRes.ok) {
-        const msg = await putRes.text().catch(() => "");
-        throw new Error(`Failed to restore vendor product quantities: ${msg}`);
-      }
-      invalidateVendorProductsCache(vendorId);
-      console.log("✅ [vendorStock] Vendor product quantities restored.");
-    } catch (error) {
-      console.error(
-        "[vendorStock] Error restoring vendor product quantities:",
-        error,
-      );
-    }
-  };
 
   const handleCancelOrder = async () => {
     try {
       const detailsResponse = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+        `https://localhost:7091/api/Mart/GetProductDetails?id=${groceryItemId}`,
       );
       if (!detailsResponse.ok)
         throw new Error("Failed to fetch latest order details");
@@ -525,7 +275,7 @@ const AdminOrderClose = () => {
       };
 
       const cancelResponse = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://localhost:7091/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -917,7 +667,7 @@ const AdminOrderClose = () => {
           if (!item.image) return;
           try {
             const res = await fetch(
-              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+              `https://localhost:7091/api/FileUpload/download?generatedfilename=${encodeURIComponent(
                 item.image,
               )}`,
               { signal: controller.signal },
@@ -1193,15 +943,17 @@ const AdminOrderClose = () => {
                 </Col>
               </Row>
               <div className="mt-2 d-flex justify-content-between">
-                {/* <Button
+                <Button
                   type="submit"
                   className=" text-white mx-2"
                   style={{ background: "green" }}
-                  onClick={() => navigate(`/adminGroceryZoneDashboard`)}
+                  onClick={() => navigate(`/adminOrderCloseDashboard`)}
                   title="Back"
                 >
                   <ArrowBack />
                 </Button>
+
+                {/*
                 <Button
                   type="submit"
                   className="text-white mx-2"
@@ -1211,7 +963,9 @@ const AdminOrderClose = () => {
                   disabled={!!paidAmount || !selectedPartner}
                 >
                   <ForwardIcon />
-                </Button> */}
+                </Button> 
+                
+                */}
                 <Button
                   className="text-white mx-2"
                   style={{ background: "red" }}

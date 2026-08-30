@@ -7,8 +7,7 @@ import ImageCache from "./utils/ImageCache";
 import { CartStorage } from "./CartStorage";
 import { getImageFilename, imageValueToUrl } from "./utils/imageSource";
 
-const API_BASE =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net";
+const API_BASE = "https://localhost:7091";
 
 const getLimit = (product) => {
   if (!product) return Infinity;

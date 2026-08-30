@@ -83,9 +83,7 @@ const ApartmentRaiseTicket = () => {
 
   useEffect(() => {
     axios
-      .get(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
-      )
+      .get(`https://localhost:7091/api/MasterData/getStates`)
       .then((response) => {
         const data = response.data;
         console.log("States API Response:", data);
@@ -100,9 +98,7 @@ const ApartmentRaiseTicket = () => {
   useEffect(() => {
     if (stateId) {
       axios
-        .get(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
-        )
+        .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
         .then((response) => {
           setDistrictList(response.data);
         })
@@ -136,7 +132,7 @@ const ApartmentRaiseTicket = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ApartmentMaintenance/GetAddressMaintenanceDataByMobileNo?mobileNo=${mobileNumber}`,
+        `https://localhost:7091/api/ApartmentMaintenance/GetAddressMaintenanceDataByMobileNo?mobileNo=${mobileNumber}`,
       );
       if (!response.ok) throw new Error("Failed to fetch Apartment data");
       const data = await response.json();
@@ -272,8 +268,7 @@ const ApartmentRaiseTicket = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
-          fileName,
+        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
         {
           method: "POST",
           headers: {
@@ -330,7 +325,7 @@ const ApartmentRaiseTicket = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ApartmentRaiseTicket/CreateApartmentRaiseTicket`,
+        `https://localhost:7091/api/ApartmentRaiseTicket/CreateApartmentRaiseTicket`,
         {
           method: "POST",
           headers: {
@@ -423,7 +418,7 @@ const ApartmentRaiseTicket = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ApartmentMaintenance/CreateApartmentMaintence`,
+        `https://localhost:7091/api/ApartmentMaintenance/CreateApartmentMaintence`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -493,7 +488,7 @@ const ApartmentRaiseTicket = () => {
     };
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ApartmentMaintenance/${id}`,
+        `https://localhost:7091/api/ApartmentMaintenance/${id}`,
         {
           method: "PUT",
           headers: {

@@ -23,7 +23,7 @@ const ProductViewModal = ({ show, handleClose, productId }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${productId}`,
+          `https://localhost:7091/api/Product/${productId}`,
         );
         const data = await response.json();
         setProductData(data);
@@ -31,7 +31,7 @@ const ProductViewModal = ({ show, handleClose, productId }) => {
         const imageRequests =
           data.productPhotos?.map((photo) =>
             fetch(
-              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
+              `https://localhost:7091/api/FileUpload/download?generatedfilename=${photo}`,
             )
               .then((res) => res.json())
               .then((data) => ({ src: photo, imageData: data.imageData })),

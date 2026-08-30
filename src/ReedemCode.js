@@ -44,7 +44,7 @@ function ReedemCode({
   const fetchNumbers = async () => {
     try {
       const response = await fetch(
-        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/download-json",
+        "https://localhost:7091/api/Customer/download-json",
       );
       const data = await response.json();
       setNumbers(data);
@@ -124,7 +124,7 @@ function ReedemCode({
   const checkNewOrExisting = useCallback(async (num) => {
     try {
       const res = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${encodeURIComponent(
+        `https://localhost:7091/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${encodeURIComponent(
           num,
         )}`,
       );
@@ -150,7 +150,7 @@ function ReedemCode({
 
   const getReferralRecord = async (userId) => {
     if (!userId) return null;
-    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(
+    const url = `https://localhost:7091/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(
       userId,
     )}`;
     const res = await fetch(url);
@@ -355,7 +355,7 @@ function ReedemCode({
     };
 
     if (record?.id) {
-      const putUrl = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(
+      const putUrl = `https://localhost:7091/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(
         record.id,
       )}`;
       const r = await fetch(putUrl, {
@@ -371,7 +371,7 @@ function ReedemCode({
       if (!r.ok) throw new Error(d?.message || `PUT failed: ${r.status}`);
       return d || { ok: true };
     } else {
-      const postUrl = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/UploadReferralPoints`;
+      const postUrl = `https://localhost:7091/api/ReferralPoints/UploadReferralPoints`;
       const r = await fetch(postUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -416,17 +416,14 @@ function ReedemCode({
         userId: referrerId,
       });
       // 2) Send promo SMS to all 3 new numbers
-      await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Auth/sendpromosms`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            mobile: numbersArr.join(","),
-            name: customerName,
-          }),
-        },
-      );
+      await fetch(`https://localhost:7091/api/Auth/sendpromosms`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mobile: numbersArr.join(","),
+          name: customerName,
+        }),
+      });
       alert(
         `🎉 Thank you for referring your friend! ₹100 referral amount has been added to your wallet after they registered.🙏💰✨`,
       );

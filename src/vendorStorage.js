@@ -197,7 +197,7 @@ export const updateVendorProfile = (vendorId, updates) => {
 export const loginVendorViaApi = async (userName, password) => {
   try {
     const url =
-      `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/GetVendorDetailsByUserNameAndPassword` +
+      `https://localhost:7091/api/VendorRegistration/GetVendorDetailsByUserNameAndPassword` +
       `?userName=${encodeURIComponent(userName)}` +
       `&password=${encodeURIComponent(password)}`;
 

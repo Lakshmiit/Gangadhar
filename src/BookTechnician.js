@@ -90,7 +90,7 @@ const AddressManager = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
+        `https://localhost:7091/api/Address/GetAddressById/${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -139,9 +139,7 @@ const AddressManager = () => {
 
   useEffect(() => {
     axios
-      .get(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
-      )
+      .get(`https://localhost:7091/api/MasterData/getStates`)
       .then((response) => {
         const data = response.data;
         console.log("States API Response:", data);
@@ -156,9 +154,7 @@ const AddressManager = () => {
   useEffect(() => {
     if (stateId) {
       axios
-        .get(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
-        )
+        .get(`https://localhost:7091/api/MasterData/getDistricts/${stateId}`)
         .then((response) => {
           setDistrictList(response.data);
         })
@@ -227,7 +223,7 @@ const AddressManager = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/GetSelctedJobsByCategory?Category=${selectedCategory}`,
+        `https://localhost:7091/api/UploadJobDescriptionBookTechnician/GetSelctedJobsByCategory?Category=${selectedCategory}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch jobs");
@@ -361,7 +357,7 @@ const AddressManager = () => {
     };
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BookTechnician/CreateBookTechnician`,
+        `https://localhost:7091/api/BookTechnician/CreateBookTechnician`,
         {
           method: "POST",
           headers: {
@@ -438,7 +434,7 @@ const AddressManager = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
+        `https://localhost:7091/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: {

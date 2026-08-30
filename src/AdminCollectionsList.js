@@ -21,7 +21,7 @@ const AdminCollectionsList = () => {
   const navigate = useNavigate();
   useEffect(() => {
     setLoading(true);
-    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetAllLakshmiCollections`;
+    const url = `https://localhost:7091/api/UploadLakshmiCollection/GetAllLakshmiCollections`;
     axios
       .get(url)
       .then((response) => {
@@ -61,9 +61,7 @@ const AdminCollectionsList = () => {
     );
     if (confirmDelete) {
       axios
-        .delete(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${collectionId}`,
-        )
+        .delete(`https://localhost:7091/api/Product/${collectionId}`)
         .then(() => {
           setCollectionData((prevData) =>
             prevData.filter((collection) => collection.id !== collectionId),

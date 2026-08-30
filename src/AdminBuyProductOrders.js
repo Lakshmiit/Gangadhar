@@ -91,7 +91,7 @@ const AdminBuyProductOrders = () => {
     const fetchProductData = async () => {
       try {
         const response = await fetch(
-          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsById/${buyProductId}`,
+          `https://localhost:7091/api/BuyProduct/GetBuyProductDetailsById/${buyProductId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch product data");
@@ -241,7 +241,7 @@ const AdminBuyProductOrders = () => {
 
     try {
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/${buyProductId}`,
+        `https://localhost:7091/api/BuyProduct/${buyProductId}`,
         {
           method: "PUT",
           headers: {
@@ -332,8 +332,7 @@ const AdminBuyProductOrders = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
-          fileName,
+        `https://localhost:7091/api/FileUpload/upload?filename=` + fileName,
         {
           method: "POST",
           headers: {

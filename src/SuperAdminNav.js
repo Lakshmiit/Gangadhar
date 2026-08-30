@@ -19,7 +19,7 @@ const TABS = [
 // Same endpoint RaiseTicketNotifications.js / AdminNotifications.js read
 // from — the full list of raised tickets across every customer.
 const GET_TICKETS_NOTIFICATIONS_URL =
-  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/GetTicketsNotifications";
+  "https://localhost:7091/api/RaiseTicket/GetTicketsNotifications";
 const TICKET_POLL_INTERVAL_MS = 25000;
 
 const SuperAdminNav = ({ active }) => {
