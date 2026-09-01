@@ -8,13 +8,12 @@ import { playNotificationSound } from "./notificationSound";
 import { speakTeluguAlert } from "./speechAlert";
 
 // Small shared header used across the /superadmin/* pages so the super
-// admin can hop between Vendors, Delivery Partners, Orders, and Vendor
-// Requests without having to know the URLs.
+// admin can hop between Vendors, Delivery Partners, and Orders without
+// having to know the URLs.
 const TABS = [
   { label: "Vendors", path: "/superadmin/vendors" },
   { label: "Delivery Partners", path: "/superadmin/delivery-partners" },
   { label: "Orders", path: "/superadmin/orders" },
-  { label: "Vendor Requests", path: "/superadmin/vendor-requests" },
 ];
 
 // Same endpoint RaiseTicketNotifications.js / AdminNotifications.js read
@@ -56,8 +55,8 @@ const SuperAdminNav = ({ active }) => {
       .toString()
       .trim();
     const message = pincode
-      ? ` ${customerName}, పిన్ కోడ్ ${pincode}.`
-      : ` ${customerName}.`;
+      ? `కొత్త టికెట్ వచ్చింది, కస్టమర్ పేరు ${customerName}, పిన్ కోడ్ ${pincode}.`
+      : `కొత్త టికెట్ వచ్చింది, కస్టమర్ పేరు ${customerName}.`;
     speakTeluguAlert(message);
   }, []);
 
@@ -159,10 +158,7 @@ const SuperAdminNav = ({ active }) => {
           )}
         </IconButton>
 
-        <button
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handleLogout}
-        >
+        <button className="btn btn-outline-secondary btn-sm" onClick={handleLogout}>
           Log out
         </button>
       </div>

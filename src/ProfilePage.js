@@ -3586,6 +3586,8 @@ const ProfilePage = () => {
             )}
 
             {/* Mobile Dashboard Icons */}
+            {/* Mobile Dashboard Icons */}
+            {/* Mobile Dashboard Icons */}
             {isMobile && (
               <div
                 className="mobile-top-icons position-fixed start-0 end-0 bg-white border-bottom shadow-sm"
@@ -3609,7 +3611,7 @@ const ProfilePage = () => {
                       >
                         <div
                           style={{
-                            backgroundColor: "#ffc107",
+                            backgroundColor: "#dc3545",
                             borderRadius: "50%",
                             padding: "8px",
                             display: "flex",
@@ -3626,14 +3628,14 @@ const ProfilePage = () => {
                               style={{
                                 fontSize: 14,
                                 fontWeight: "bold",
-                                color: "#000",
+                                color: "#fff",
                               }}
                             >
                               {getVendorIcon(vendorProfile?.name)}
                             </span>
                           ) : (
                             React.cloneElement(menu.MenuIcon, {
-                              sx: { fontSize: 22, color: "#000" },
+                              sx: { fontSize: 22, color: "#fff" },
                             })
                           )}
                           {renderVendorOrderBell()}
@@ -3680,7 +3682,7 @@ const ProfilePage = () => {
                             justifyContent: "center",
                             width: "40px",
                             height: "40px",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                            boxShadow: "0 2px 6px rgba(131, 122, 122, 0.15)",
                           }}
                         >
                           {React.cloneElement(menu.MenuIcon, {
@@ -3714,7 +3716,6 @@ const ProfilePage = () => {
                 </div>
               </div>
             )}
-
             <div className="col-md-9">
               {/* 🥚 DAILY POT REWARD GAME */}
               <PotRewardGame

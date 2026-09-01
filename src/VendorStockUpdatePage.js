@@ -100,7 +100,8 @@ const extractSelectionFromVendorProducts = (vendorProductsRaw) => {
   const map = {};
   const qtyMap = {};
   const limitMap = {};
-
+  const mrpMap = {};
+  const priceMap = {};
   const vendorProducts = Array.isArray(vendorProductsRaw)
     ? vendorProductsRaw[0]
     : vendorProductsRaw;
@@ -120,16 +121,18 @@ const extractSelectionFromVendorProducts = (vendorProductsRaw) => {
       const qty = p.quantity ?? p.qty ?? p.Quantity;
       const discount = p.discount ?? p.Discount;
       const limit = p.limit ?? p.Limit;
-
+      const mrp = p.mrp ?? p.Mrp;
+      const price = p.price ?? p.Price ?? p.afterDiscount ?? p.AfterDiscount;
       if (!productId || !(Number(qty) > 0)) return;
-
+      if (mrp !== undefined) mrpMap[productId] = Number(mrp);
+      if (price !== undefined) priceMap[productId] = Number(price);
       map[productId] = { checked: true, discount: String(discount ?? "0") };
       qtyMap[productId] = Number(qty);
       limitMap[productId] = Number(limit ?? 0);
     });
   });
 
-  return { map, qtyMap, limitMap };
+  return { map, qtyMap, limitMap, mrpMap, priceMap };
 };
 
 // Direct fetch, bypassing utils/vendorListStore.js's cache/normalizeVendor
@@ -200,16 +203,43 @@ const VendorStockUpdatePage = () => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanFrameRef = useRef(null);
-
-  // ---- Fast selection for the vendor's own submission ----
-  // itemId -> { checked: bool, discount: string }. `checked` always mirrors
-  // whether pendingQty[itemId] > 0 — typing a quantity (or its checkbox
-  // shortcut) is what adds/removes a product here, never a separate action.
-  // This auto-saves to localStorage in the vendorUploadProducts payload
-  // shape; VendorPreviewPage reads that cart back for a final review + submit.
+  const [pendingMrp, setPendingMrp] = useState({});
+  const [pendingPrice, setPendingPrice] = useState({});
+  const [mrpInputText, setMrpInputText] = useState({});
+  const [priceInputText, setPriceInputText] = useState({});
   const [selection, setSelection] = useState({});
   const hydratedSelectionRef = useRef(false);
   const hydratedBackendRef = useRef(false);
+  const [qtyInputText, setQtyInputText] = useState({});
+  const originalValuesRef = useRef({});
+  const getPendingMrp = (item) => Number(pendingMrp[item.id] ?? item.mrp ?? 0);
+
+  const getPendingPrice = (item) =>
+    Number(pendingPrice[item.id] ?? item.afterDiscount ?? item.mrp ?? 0);
+
+  const handleMrpInputChange = (itemId, rawValue) => {
+    setMrpInputText((prev) => ({ ...prev, [itemId]: rawValue }));
+    const next = Math.max(0, Number(rawValue) || 0);
+    setPendingMrp((prev) => ({ ...prev, [itemId]: next }));
+  };
+
+  const handlePriceInputChange = (itemId, rawValue) => {
+    setPriceInputText((prev) => ({ ...prev, [itemId]: rawValue }));
+    const next = Math.max(0, Number(rawValue) || 0);
+    setPendingPrice((prev) => ({ ...prev, [itemId]: next }));
+  };
+
+  const getMrpDisplayValue = (item) => {
+    if (mrpInputText[item.id] !== undefined) return mrpInputText[item.id];
+    const mrp = getPendingMrp(item);
+    return mrp === 0 ? "" : mrp;
+  };
+
+  const getPriceDisplayValue = (item) => {
+    if (priceInputText[item.id] !== undefined) return priceInputText[item.id];
+    const price = getPendingPrice(item);
+    return price === 0 ? "" : price;
+  };
 
   // Vendor session check.
   useEffect(() => {
@@ -315,8 +345,19 @@ const VendorStockUpdatePage = () => {
           JSON.stringify(vendorProducts, null, 2),
         );
 
-        const { map, qtyMap, limitMap } =
+        const { map, qtyMap, limitMap, mrpMap, priceMap } =
           extractSelectionFromVendorProducts(vendorProducts);
+        const baseline = {};
+        Object.keys(map).forEach((productId) => {
+          baseline[productId] = {
+            quantity: String(qtyMap[productId] ?? 0),
+            discount: String(map[productId]?.discount ?? "0"),
+            limit: String(limitMap[productId] ?? 0),
+            mrp: String(mrpMap[productId] ?? ""),
+            price: String(priceMap[productId] ?? ""),
+          };
+        });
+        originalValuesRef.current = baseline;
 
         if (Object.keys(map).length)
           setSelection((prev) => ({ ...map, ...prev }));
@@ -324,6 +365,10 @@ const VendorStockUpdatePage = () => {
           setPendingQty((prev) => ({ ...qtyMap, ...prev }));
         if (Object.keys(limitMap).length)
           setPendingLimit((prev) => ({ ...limitMap, ...prev }));
+        if (Object.keys(mrpMap).length)
+          setPendingMrp((prev) => ({ ...mrpMap, ...prev }));
+        if (Object.keys(priceMap).length)
+          setPendingPrice((prev) => ({ ...priceMap, ...prev }));
       } catch (err) {
         // No submission yet (404) or a network hiccup — fine, just start
         // from whatever the localStorage draft below provides (or blank).
@@ -334,6 +379,35 @@ const VendorStockUpdatePage = () => {
       }
     })();
   }, [vendor, vendorId]);
+
+  // A product is "updated" if either:
+  //  (a) it's a brand-new selection not present in the backend's last
+  //      submitted record, OR
+  //  (b) it IS in the backend record but at least one editable field
+  //      (quantity/discount/limit/mrp/price) differs from that baseline.
+  const isProductUpdated = (item) => {
+    const baseline = originalValuesRef.current[item.id];
+
+    const current = {
+      quantity: String(pendingQty[item.id] || 0),
+      discount: String(selection[item.id]?.discount ?? item.discount ?? 0),
+      limit: String(pendingLimit[item.id] ?? item.limit ?? 0),
+      mrp: String(pendingMrp[item.id] ?? item.mrp ?? 0),
+      price: String(
+        pendingPrice[item.id] ?? item.afterDiscount ?? item.mrp ?? 0,
+      ),
+    };
+
+    if (!baseline) return true; // never submitted before -> it's new/updated
+
+    return (
+      current.quantity !== baseline.quantity ||
+      current.discount !== baseline.discount ||
+      current.limit !== baseline.limit ||
+      current.mrp !== baseline.mrp ||
+      current.price !== baseline.price
+    );
+  };
 
   // Restore any products the vendor already checked/discounted/limited last
   // time they were on this page, so the cart survives navigation/reloads.
@@ -349,6 +423,8 @@ const VendorStockUpdatePage = () => {
       const map = {};
       const qtyMap = {};
       const limitMap = {};
+      const mrpMap = {};
+      const priceMap = {};
       (saved.categorie || []).forEach((cat) => {
         (cat.products || []).forEach((p) => {
           if (p?.productIds) {
@@ -358,6 +434,8 @@ const VendorStockUpdatePage = () => {
             };
             qtyMap[p.productIds] = Number(p.quantity || 0);
             limitMap[p.productIds] = Number(p.limit ?? 0);
+            if (p.mrp !== undefined) mrpMap[p.productIds] = Number(p.mrp);
+            if (p.price !== undefined) priceMap[p.productIds] = Number(p.price);
           }
         });
       });
@@ -367,6 +445,10 @@ const VendorStockUpdatePage = () => {
         setPendingQty((prev) => ({ ...prev, ...qtyMap }));
       if (Object.keys(limitMap).length)
         setPendingLimit((prev) => ({ ...prev, ...limitMap }));
+      if (Object.keys(mrpMap).length)
+        setPendingMrp((prev) => ({ ...mrpMap, ...prev }));
+      if (Object.keys(priceMap).length)
+        setPendingPrice((prev) => ({ ...priceMap, ...prev }));
     } catch (err) {
       // ignore malformed/old local cart
     }
@@ -380,7 +462,7 @@ const VendorStockUpdatePage = () => {
   useEffect(() => {
     if (!vendor) return;
     const selectedItems = items.filter(
-      (it) => Number(pendingQty[it.id] || 0) > 0,
+      (it) => !!selection[it.id]?.checked && isProductUpdated(it),
     );
     const categorieMap = {};
     selectedItems.forEach((item) => {
@@ -391,6 +473,10 @@ const VendorStockUpdatePage = () => {
         quantity: String(pendingQty[item.id] || 0),
         discount: String(selection[item.id]?.discount ?? item.discount ?? 0),
         limit: String(pendingLimit[item.id] ?? item.limit ?? 0),
+        mrp: String(pendingMrp[item.id] ?? item.mrp ?? 0),
+        price: String(
+          pendingPrice[item.id] ?? item.afterDiscount ?? item.mrp ?? 0,
+        ),
       });
     });
     const payload = {
@@ -408,10 +494,18 @@ const VendorStockUpdatePage = () => {
     };
     try {
       localStorage.setItem(pendingCartKey(vendorId), JSON.stringify(payload));
-    } catch (err) {
-      // storage full/unavailable — selection still works for this session
-    }
-  }, [selection, pendingQty, pendingLimit, items, vendor, vendorId]);
+    } catch (err) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selection,
+    pendingQty,
+    pendingLimit,
+    pendingMrp,
+    pendingPrice,
+    items,
+    vendor,
+    vendorId,
+  ]);
 
   // Same image-loading pattern as GroceryItems.js / ProfilePage.js:
   // check IndexedDB cache first, otherwise download + cache.
@@ -510,49 +604,38 @@ const VendorStockUpdatePage = () => {
 
   const getPendingQty = (itemId) => Number(pendingQty[itemId] || 0);
 
-  // Quantity is the single source of truth for "is this product going into
-  // the submission payload". Bumping it above 0 auto-selects the product;
-  // dropping it back to 0 auto-removes it — no separate save step. Used by
-  // the checkbox shortcut (toggleSelectForSubmission / toggleCategorySelection).
-  const handlePendingChange = (itemId, delta, item) => {
-    setPendingQty((prev) => {
-      const next = Math.max(0, Number(prev[itemId] || 0) + delta);
-      setSelection((prevSel) => {
-        if (next > 0) {
-          const current = prevSel[itemId];
-          return {
-            ...prevSel,
-            [itemId]: {
-              checked: true,
-              discount: current?.discount ?? String(item?.discount ?? 0),
-            },
-          };
-        }
-        if (!prevSel[itemId]) return prevSel;
-        const nextSel = { ...prevSel };
-        delete nextSel[itemId];
-        return nextSel;
-      });
-      return { ...prev, [itemId]: next };
-    });
-  };
-
-  const isSelectedForSubmission = (itemId) => getPendingQty(itemId) > 0;
+  const isSelectedForSubmission = (itemId) => !!selection[itemId]?.checked;
   const getSelectionDiscount = (item) =>
     selection[item.id]?.discount ?? String(item.discount ?? 0);
 
   const getPendingLimit = (item) =>
     Number(pendingLimit[item.id] ?? item.limit ?? 0);
 
-  // Checkbox shortcut: checking a product jumps its quantity straight to 1
-  // (adding it to the payload); unchecking zeroes the quantity back out
-  // (removing it).
   const toggleSelectForSubmission = (item) => {
-    const current = getPendingQty(item.id);
-    if (current > 0) {
-      handlePendingChange(item.id, -current, item);
+    const currentlyChecked = !!selection[item.id]?.checked;
+
+    if (currentlyChecked) {
+      setSelection((prev) => {
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
+      setPendingQty((prev) => ({ ...prev, [item.id]: 0 }));
+      setQtyInputText((prev) => {
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
     } else {
-      handlePendingChange(item.id, 1, item);
+      // Check: mark it selected for submission — do NOT force quantity to 1.
+      // Quantity stays whatever it currently is (0 if untouched).
+      setSelection((prev) => ({
+        ...prev,
+        [item.id]: {
+          checked: true,
+          discount: prev[item.id]?.discount ?? String(item.discount ?? 0),
+        },
+      }));
     }
   };
 
@@ -565,11 +648,48 @@ const VendorStockUpdatePage = () => {
   const isCategorySelected = (category) => {
     const categoryItems = getCategoryItems(category);
     if (categoryItems.length === 0) return false;
-    return categoryItems.every((item) => Number(pendingQty[item.id] || 0) > 0);
+    return categoryItems.every((item) => !!selection[item.id]?.checked);
+  };
+
+  const toggleCategorySelection = (category) => {
+    const categoryItems = getCategoryItems(category);
+    const shouldSelect = !isCategorySelected(category);
+
+    setSelection((prevSelection) => {
+      const nextSelection = { ...prevSelection };
+      categoryItems.forEach((item) => {
+        if (shouldSelect) {
+          nextSelection[item.id] = {
+            checked: true,
+            discount: String(
+              prevSelection[item.id]?.discount ?? item.discount ?? 0,
+            ),
+          };
+        } else {
+          delete nextSelection[item.id];
+        }
+      });
+      return nextSelection;
+    });
+
+    if (!shouldSelect) {
+      // Unselecting the category also resets those items' restock qty to 0.
+      setPendingQty((prevQty) => {
+        const nextQty = { ...prevQty };
+        categoryItems.forEach((item) => {
+          nextQty[item.id] = 0;
+        });
+        return nextQty;
+      });
+    }
+    // Selecting the category leaves quantities as-is (default 0).
   };
 
   // ---- Direct-typing handlers for the plain number inputs ----
   const handleQtyInputChange = (itemId, rawValue, item) => {
+    // Keep exactly what the user typed for display (allows "0", "", "05" while typing)
+    setQtyInputText((prev) => ({ ...prev, [itemId]: rawValue }));
+
     const next = Math.max(0, Number(rawValue) || 0);
     setPendingQty((prev) => ({ ...prev, [itemId]: next }));
     setSelection((prevSel) => {
@@ -590,56 +710,33 @@ const VendorStockUpdatePage = () => {
     });
   };
 
+  const getQtyDisplayValue = (itemId) => {
+    // If the user has typed something (even "0"), show exactly that.
+    if (qtyInputText[itemId] !== undefined) return qtyInputText[itemId];
+    // Otherwise fall back to the numeric state (blank if 0/untouched).
+    const qty = getPendingQty(itemId);
+    return qty === 0 ? "" : qty;
+  };
+
   const handleLimitInputChange = (itemId, rawValue, item) => {
     const liveStock = Number(item.stockLeft || 0);
     const next = Math.max(0, Math.min(Number(rawValue) || 0, liveStock));
     setPendingLimit((prev) => ({ ...prev, [itemId]: next }));
   };
 
-  const toggleCategorySelection = (category) => {
-    const categoryItems = getCategoryItems(category);
-    const shouldSelect = !isCategorySelected(category);
-
-    setPendingQty((prevQty) => {
-      const nextQty = { ...prevQty };
-      categoryItems.forEach((item) => {
-        nextQty[item.id] = shouldSelect ? 1 : 0;
-      });
-      return nextQty;
-    });
-
-    setSelection((prevSelection) => {
-      const nextSelection = { ...prevSelection };
-      categoryItems.forEach((item) => {
-        if (shouldSelect) {
-          nextSelection[item.id] = {
-            checked: true,
-            discount: String(
-              prevSelection[item.id]?.discount ?? item.discount ?? 0,
-            ),
-          };
-        } else {
-          delete nextSelection[item.id];
-        }
-      });
-      return nextSelection;
-    });
-  };
-
   const updateSelectionDiscount = (item, value) => {
-    // Editing the discount never selects a product on its own — only
-    // quantity does that. This just updates the discount for whatever
-    // selection state the quantity has already produced.
     setSelection((prev) => ({
       ...prev,
-      [item.id]: { checked: getPendingQty(item.id) > 0, discount: value },
+      [item.id]: {
+        checked: !!prev[item.id]?.checked, // <-- was: getPendingQty(item.id) > 0
+        discount: value,
+      },
     }));
   };
 
   const selectedForSubmissionCount = useMemo(
-    () =>
-      Object.keys(pendingQty).filter((id) => Number(pendingQty[id]) > 0).length,
-    [pendingQty],
+    () => Object.values(selection).filter((s) => s?.checked).length,
+    [selection],
   );
 
   const handleRefresh = () => {
@@ -1266,7 +1363,7 @@ const VendorStockUpdatePage = () => {
               <div className="d-flex flex-wrap gap-3 mb-4">
                 {displayedItems.map((item) => {
                   const liveStock = Number(item.stockLeft || 0);
-                  const restockQty = getPendingQty(item.id);
+                  // const restockQty = getPendingQty(item.id);
                   const restockLimit = getPendingLimit(item);
                   const isOutOfStock = liveStock <= 0;
                   return (
@@ -1381,7 +1478,7 @@ const VendorStockUpdatePage = () => {
                           min="0"
                           className="form-control form-control-sm"
                           style={{ fontSize: "12px" }}
-                          value={restockQty === 0 ? "" : restockQty}
+                          value={getQtyDisplayValue(item.id)}
                           onChange={(e) =>
                             handleQtyInputChange(item.id, e.target.value, item)
                           }
@@ -1472,6 +1569,59 @@ const VendorStockUpdatePage = () => {
                             %
                           </span>
                         </div>
+                      </div>
+                      {/* ---- Submit MRP ---- */}
+                      <div className="mt-2">
+                        <div
+                          className="d-flex justify-content-between align-items-center mb-1"
+                          style={{ fontSize: "10px", color: "#6B7A70" }}
+                        >
+                          <span>MRP (₹)</span>
+                          <span
+                            className="fw-bold"
+                            style={{ color: "#8a611c" }}
+                          >
+                            Edit MRP
+                          </span>
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control form-control-sm"
+                          style={{ fontSize: "12px" }}
+                          value={getMrpDisplayValue(item)}
+                          onChange={(e) =>
+                            handleMrpInputChange(item.id, e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* ---- Submit Price (after discount) ---- */}
+                      <div className="mt-2">
+                        <div
+                          className="d-flex justify-content-between align-items-center mb-1"
+                          style={{ fontSize: "10px", color: "#6B7A70" }}
+                        >
+                          <span>Selling price (₹)</span>
+                          <span
+                            className="fw-bold"
+                            style={{ color: "#8a611c" }}
+                          >
+                            Edit Price
+                          </span>
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control form-control-sm"
+                          style={{ fontSize: "12px" }}
+                          value={getPriceDisplayValue(item)}
+                          onChange={(e) =>
+                            handlePriceInputChange(item.id, e.target.value)
+                          }
+                        />
                       </div>
                     </div>
                   );

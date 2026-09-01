@@ -1710,7 +1710,6 @@ const GroceryPaymentmethod = () => {
     zipCode: "",
     walletAmount: "",
   });
-  const [serviceUnavailable, setServiceUnavailable] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [newAddress, setNewAddress] = useState("");
   const [state, setState] = useState("");
@@ -1996,15 +1995,15 @@ const GroceryPaymentmethod = () => {
     }
   }, [userId]);
 
-  useEffect(() => {
-    const primary = addresses.find((addr) => addr.type === "primary");
-    const district = primary?.district?.toLowerCase();
-    if (district && district !== "visakhapatnam") {
-      setServiceUnavailable(true);
-    } else {
-      setServiceUnavailable(false);
-    }
-  }, [addresses]);
+  // useEffect(() => {
+  //   const primary = addresses.find((addr) => addr.type === "primary");
+  //   const district = primary?.district?.toLowerCase();
+  //   if (district && district !== "visakhapatnam") {
+  //     setServiceUnavailable(true);
+  //   } else {
+  //     setServiceUnavailable(false);
+  //   }
+  // }, [addresses]);
 
   useEffect(() => {
     fetchCustomerData();
@@ -2184,8 +2183,7 @@ const GroceryPaymentmethod = () => {
 
   const isAddressInvalid =
     !primaryAddress || !primaryAddress.address || !primaryAddress.zipCode;
-  const isOrderDisabled =
-    isAddressInvalid || serviceUnavailable || isFirstOrderMinNotReached;
+  const isOrderDisabled = isAddressInvalid || isFirstOrderMinNotReached;
   useEffect(() => {
     if (isAddressInvalid) {
       setShouldBlink(true);
@@ -3031,7 +3029,7 @@ const GroceryPaymentmethod = () => {
           {fullName.trim().toLowerCase() === "guest" && (
             <p className="text-danger">Note: Enter your Delivery Address</p>
           )}
-          <div className="m-2">
+          {/* <div className="m-2">
             {serviceUnavailable && (
               <div className="alert alert-danger">
                 <strong>Note:</strong> Currently, the options to Raise a Ticket,
@@ -3041,7 +3039,7 @@ const GroceryPaymentmethod = () => {
                 customer support at 6281198953.
               </div>
             )}
-          </div>
+          </div> */}
 
           <div className="grocery-confirmation">
             <p className="text-center" style={{ fontSize: "13px" }}>
@@ -3305,11 +3303,9 @@ const GroceryPaymentmethod = () => {
                 title={
                   isAddressInvalid
                     ? "Please add a valid address"
-                    : serviceUnavailable
-                      ? "Service unavailable in your area"
-                      : isFirstOrderMinNotReached
-                        ? "Minimum order value ₹150 required on your first order to get ₹50 cashback."
-                        : ""
+                    : isFirstOrderMinNotReached
+                      ? "Minimum order value ₹150 required on your first order to get ₹50 cashback."
+                      : ""
                 }
               >
                 {loading ? "Confirming Order..." : "Order Now"}

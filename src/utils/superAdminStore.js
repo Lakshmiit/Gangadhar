@@ -4,22 +4,12 @@ import axios from "axios";
 const API_BASE =
   "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
 const GET_ALL_VENDORS = `${API_BASE}/VendorRegistration/GetAllVendors`;
-const GET_VENDOR_DETAILS_BY_VENDOR_ID = `${API_BASE}/VendorRegistration/GetVendorDetailsByVendorId`;
-//const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
-
 const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
 const UPDATE_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/UpdateVendorProductsValues`;
 const GET_ALL_DELIVERY_PARTNERS = `${API_BASE}/DeliveryPartner/GetAllDeliveryPartners`;
 const UPDATE_DELIVERY_PARTNER_DETAILS = `${API_BASE}/DeliveryPartner/UpdateDeliveryPartnerDetails`;
 const GET_ALL_MART_ITEMS = `${API_BASE}/Mart/GetAllMartItems`;
 
-// ---- Zones ----
-// Reference pincode->zone map for Visakhapatnam service areas. Used purely
-// as a display label (e.g. "Zone A") next to a vendor's own registered
-// pincodes on the super admin review page — it is NOT used to restrict
-// which pincodes an admin can pick from anymore. A vendor registered
-// outside these zones (different district, etc.) will simply show no
-// zone label, and that's fine.
 export const zoneData = {
   A: ["530001", "530002", "530003", "530004"],
   B: ["530005", "530013", "530016", "530020", "530024", "530022", "530017"],
@@ -90,19 +80,6 @@ export function logoutSuperAdmin() {
 export async function getAllVendors() {
   const { data } = await axios.get(GET_ALL_VENDORS);
   return Array.isArray(data) ? data : [];
-}
-
-// GetVendorDetailsByVendorId replies with an array holding the vendor's
-// registration record — { vendorId, fullName, address, state, district,
-// zipcodes: [...], ... }. Used here purely to pull the zipcodes the
-// vendor registered as serviceable, so the product-review page can offer
-// just those as checkboxes instead of every zone in the city.
-export async function getVendorZipcodes(vendorId) {
-  const { data } = await axios.get(GET_VENDOR_DETAILS_BY_VENDOR_ID, {
-    params: { vendorId },
-  });
-  const record = Array.isArray(data) ? data[0] : data;
-  return Array.isArray(record?.zipcodes) ? record.zipcodes : [];
 }
 
 // GetVendorProductsvalues replies with an array holding a single
