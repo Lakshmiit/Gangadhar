@@ -33,7 +33,7 @@ const BuyProductNotificationGrid = () => {
 
   useEffect(() => {
     setLoading(true);
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsForAdminList`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsForAdminList`;
     axios
       .get(url)
       .then((response) => {
@@ -81,7 +81,7 @@ const BuyProductNotificationGrid = () => {
     if (confirmDelete) {
       axios
         .delete(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/${productId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${productId}`,
         )
         .then(() => {
           setProductData((prevData) =>

@@ -102,7 +102,7 @@ const AdminOrderClose = () => {
       const ctrl = new AbortController();
       try {
         const res1 = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
           { signal: ctrl.signal },
         );
         if (!res1.ok) throw new Error("Failed to fetch product details");
@@ -135,7 +135,7 @@ const AdminOrderClose = () => {
         }
 
         const requests = productNames.map(async (name) => {
-          const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
+          const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(
             name,
           )}`;
           const res = await fetch(url, { signal: ctrl.signal });
@@ -177,7 +177,7 @@ const AdminOrderClose = () => {
     const fetchGroceryData = async () => {
       try {
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch grocery product data");
@@ -258,7 +258,7 @@ const AdminOrderClose = () => {
   const handleCancelOrder = async () => {
     try {
       const detailsResponse = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetProductDetails?id=${groceryItemId}`,
       );
       if (!detailsResponse.ok)
         throw new Error("Failed to fetch latest order details");
@@ -275,7 +275,7 @@ const AdminOrderClose = () => {
       };
 
       const cancelResponse = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UpdateProductDetails/${groceryItemId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -291,7 +291,7 @@ const AdminOrderClose = () => {
       //await handleIncreaseVendorProductQuantities();
 
       alert("Ticket has been  Deleted successfully");
-      navigate(`/adminGroceryZoneDashboard`);
+      navigate(`/adminOrderCloseDashboard`);
     } catch (error) {
       console.error("Cancel Error:", error);
       alert("Failed to cancel order. Try again.");
@@ -667,7 +667,7 @@ const AdminOrderClose = () => {
           if (!item.image) return;
           try {
             const res = await fetch(
-              `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
                 item.image,
               )}`,
               { signal: controller.signal },

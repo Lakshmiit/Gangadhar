@@ -59,7 +59,7 @@ const UpdateBookTechnician = () => {
     const fetchTechnicianData = async () => {
       try {
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/GetTicket/${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/GetTicket/${id}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch Job Description data");
@@ -119,7 +119,7 @@ const UpdateBookTechnician = () => {
   //     };
 
   //     try {
-  //       const response = await fetch("https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/ProductUpload", {
+  //       const response = await fetch("https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/ProductUpload", {
   //         method: "POST",
   //         headers: {
   //           "Content-Type": "application/json"
@@ -202,7 +202,7 @@ const UpdateBookTechnician = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/${descriptionId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadJobDescriptionBookTechnician/${descriptionId}`,
         {
           method: "PUT",
           headers: {

@@ -298,19 +298,19 @@ const Notification = () => {
         collectionsResponse,
       ] = await Promise.all([
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetTicketsNotifications`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/GetTicketsNotifications`,
         ),
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnicianForAdminList`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BookTechnician/GetBookTechnicianForAdminList`,
         ),
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsForAdminList`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/GetBuyProductDetailsForAdminList`,
         ),
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetAllMartItems`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetAllMartItems`,
         ),
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/GetAllLakshmiCollectionsOpen`,
         ),
       ]);
 

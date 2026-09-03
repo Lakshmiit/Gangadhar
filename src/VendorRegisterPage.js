@@ -271,7 +271,7 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates",
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates",
       )
       .then((response) => {
         setStateList(response.data);
@@ -300,7 +300,7 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${formData.stateId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${formData.stateId}`,
       )
       .then((response) => {
         setDistrictList(response.data);
@@ -332,7 +332,7 @@ const VendorRegisterPage = () => {
 
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getPincodes/${formData.districtId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getPincodes/${formData.districtId}`,
       )
       .then((response) => {
         setPincodeList(response.data);
@@ -676,7 +676,7 @@ const VendorRegisterPage = () => {
       // Send JSON to existing backend
       // --------------------------------------------------------
       const response = await fetch(
-        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorRegistration/UploadVendorDetails",
         {
           method: "POST",
 

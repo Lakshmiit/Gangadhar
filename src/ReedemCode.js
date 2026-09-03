@@ -44,7 +44,7 @@ function ReedemCode({
   const fetchNumbers = async () => {
     try {
       const response = await fetch(
-        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/download-json",
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/download-json",
       );
       const data = await response.json();
       setNumbers(data);
@@ -124,7 +124,7 @@ function ReedemCode({
   const checkNewOrExisting = useCallback(async (num) => {
     try {
       const res = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${encodeURIComponent(
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/GuestUserVerificationByMobileNo?mobileNo=${encodeURIComponent(
           num,
         )}`,
       );
@@ -150,7 +150,7 @@ function ReedemCode({
 
   const getReferralRecord = async (userId) => {
     if (!userId) return null;
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(
       userId,
     )}`;
     const res = await fetch(url);
@@ -355,7 +355,7 @@ function ReedemCode({
     };
 
     if (record?.id) {
-      const putUrl = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(
+      const putUrl = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/UpdateReferralPoints?id=${encodeURIComponent(
         record.id,
       )}`;
       const r = await fetch(putUrl, {
@@ -371,7 +371,7 @@ function ReedemCode({
       if (!r.ok) throw new Error(d?.message || `PUT failed: ${r.status}`);
       return d || { ok: true };
     } else {
-      const postUrl = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/UploadReferralPoints`;
+      const postUrl = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/UploadReferralPoints`;
       const r = await fetch(postUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -417,7 +417,7 @@ function ReedemCode({
       });
       // 2) Send promo SMS to all 3 new numbers
       await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Auth/sendpromosms`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Auth/sendpromosms`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -46,7 +46,7 @@ const AdminUpdate = () => {
       try {
         setLoading(true);
         const productResponse = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
         );
         if (!productResponse.ok) {
           throw new Error("Product not found");
@@ -166,7 +166,7 @@ const AdminUpdate = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
           fileName,
         {
           method: "POST",
@@ -223,7 +223,7 @@ const AdminUpdate = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/${uniqueId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${uniqueId}`,
         {
           method: "PUT",
           headers: {

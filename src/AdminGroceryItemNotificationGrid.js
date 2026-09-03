@@ -62,7 +62,7 @@ const AdminGroceryItemNotificationGrid = () => {
 
   useEffect(() => {
     setLoading(true);
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/GetAllMartItems`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/GetAllMartItems`;
 
     axios
       .get(url)
@@ -101,7 +101,7 @@ const AdminGroceryItemNotificationGrid = () => {
     if (confirmDelete) {
       axios
         .delete(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/${groceryId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${groceryId}`,
         )
         .then(() => {
           setGroceryData((prev) => prev.filter((g) => g.id !== groceryId));

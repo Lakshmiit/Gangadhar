@@ -89,7 +89,7 @@ const AddressPage = () => {
     if (!userId) return;
     try {
       const response = await axios.get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       const data = Array.isArray(response.data)
         ? response.data[0]
@@ -133,7 +133,7 @@ const AddressPage = () => {
   useEffect(() => {
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
       )
       .then((response) => setStateList(response.data))
       .catch((error) => console.error("Error fetching states:", error));
@@ -143,7 +143,7 @@ const AddressPage = () => {
     if (stateId) {
       axios
         .get(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
         )
         .then((response) => setDistrictList(response.data))
         .catch((error) => console.error("Error fetching districts:", error));
@@ -249,7 +249,7 @@ const AddressPage = () => {
     try {
       setSavingAddress(true);
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

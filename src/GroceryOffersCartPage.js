@@ -150,7 +150,7 @@ const GroceryOffersCartPage = () => {
 
   const getReferralRecord = async (userId) => {
     if (!userId) return null;
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ReferralPoints/GetReferralPointsByUserId?referreId=${encodeURIComponent(userId)}`;
     const res = await fetch(url);
     const text = await res.text();
     let data = [];
@@ -180,7 +180,7 @@ const GroceryOffersCartPage = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -359,7 +359,7 @@ const GroceryOffersCartPage = () => {
   const fetchLatestStock = useCallback(async (productName) => {
     try {
       const res = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(productName)}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsByProductName?productName=${encodeURIComponent(productName)}`,
       );
       const data = await res.json();
       const normalizedInput = normalizeName(productName);
@@ -566,7 +566,7 @@ const GroceryOffersCartPage = () => {
     };
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Mart/UploadProductDetails`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Mart/UploadProductDetails`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -12,7 +12,7 @@ import axios from "axios";
 // sessionStorage (cleared automatically when the tab closes).
 
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_ALL_GROCERY_ITEMS = `${API_BASE}/UploadGrocery/GetAllGroceryItems`;
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — tune to how often the catalog actually changes

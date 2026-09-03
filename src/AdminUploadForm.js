@@ -109,7 +109,7 @@ const AdminProductUpload = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
           fileName,
         {
           method: "POST",
@@ -163,7 +163,7 @@ const AdminProductUpload = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/ProductUpload`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/ProductUpload`,
         {
           method: "POST",
           headers: {

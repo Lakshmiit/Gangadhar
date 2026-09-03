@@ -18,7 +18,7 @@ import { getGroceryItems } from "./utils/groceryStore";
 
 // Same backend the customer-facing Profile page (and Admin grocery pages) use.
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const ADD_GROCERY_ITEM = `${API_BASE}/UploadGrocery/UploadGrocery`;
 const IMAGE_DOWNLOAD = `${API_BASE}/FileUpload/download?generatedfilename=`;
 const IMAGE_UPLOAD = `${API_BASE}/FileUpload/upload?filename=`;

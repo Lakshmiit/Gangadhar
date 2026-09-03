@@ -78,7 +78,7 @@ const BuyProduct = () => {
   const fetchProfileType = useCallback(async () => {
     try {
       // ${app.}
-      const API_URL = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/`;
+      const API_URL = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/`;
       const response = await fetch(`${API_URL}${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -128,7 +128,7 @@ const BuyProduct = () => {
   useEffect(() => {
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
       )
       .then((response) => {
         const data = response.data;
@@ -145,7 +145,7 @@ const BuyProduct = () => {
     if (stateId) {
       axios
         .get(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
         )
         .then((response) => {
           setDistrictList(response.data);
@@ -241,7 +241,7 @@ const BuyProduct = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/BuyProduct/BuyProductUpload`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/BuyProduct/BuyProductUpload`,
         {
           method: "POST",
           headers: {
@@ -387,7 +387,7 @@ const BuyProduct = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: {
@@ -427,7 +427,7 @@ const BuyProduct = () => {
       setLoading(true);
       setNoProductNameError("");
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?Category=${selectedCategory}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/GetProductsByCategory?Category=${selectedCategory}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch products");

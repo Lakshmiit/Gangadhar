@@ -18,7 +18,7 @@
 //     const unsubscribe = onSnapshot(notificationsRef, async (snapshot) => {
 //       try {
 //         const response = await fetch(
-//             `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/GetNotificationsByNotExistTechnicianId?category=${category1}&district=${district1}&technicianId=${userId}`
+//             `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/GetNotificationsByNotExistTechnicianId?category=${category1}&district=${district1}&technicianId=${userId}`
 //           );
 //         const data = await response.json();
 // // alert(getTechnicianFiltered.length);

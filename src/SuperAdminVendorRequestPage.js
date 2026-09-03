@@ -3,7 +3,7 @@
 // Include this file with: <script src="vendor-request.js"></script>
 
 const VENDOR_ID = "e4499d40-5d51-4e55-8d7a-f5cb7db1267c";
-const API_URL = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${VENDOR_ID}`;
+const API_URL = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${VENDOR_ID}`;
 
 function formatDate(d) {
   if (!d) return "—";

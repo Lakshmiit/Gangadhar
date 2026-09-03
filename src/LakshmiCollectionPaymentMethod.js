@@ -52,7 +52,7 @@ const LakshmiCollectionPaymentmethod = () => {
   }, [isChecked, editingAddressId]);
 
   const getUploadItemByProductName = useCallback(async (productName) => {
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollectionsItemByProductName?productName=${encodeURIComponent(productName)}`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollectionsItemByProductName?productName=${encodeURIComponent(productName)}`;
     const res = await fetch(url);
     if (!res.ok)
       throw new Error(
@@ -68,7 +68,7 @@ const LakshmiCollectionPaymentmethod = () => {
       ...itemObj,
       stockLeft: newStockLeftStr,
     };
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${encodeURIComponent(itemObj.id)}`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${encodeURIComponent(itemObj.id)}`;
     const res = await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -90,7 +90,7 @@ const LakshmiCollectionPaymentmethod = () => {
           return;
         }
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${collectionId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${collectionId}`,
         );
         if (!response.ok) throw new Error("Failed to fetch collection details");
         const data = await response.json();
@@ -138,7 +138,7 @@ const LakshmiCollectionPaymentmethod = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Address/GetAddressById/${userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch customer profile data");
@@ -174,7 +174,7 @@ const LakshmiCollectionPaymentmethod = () => {
   useEffect(() => {
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
       )
       .then((response) => {
         const data = response.data;
@@ -191,7 +191,7 @@ const LakshmiCollectionPaymentmethod = () => {
     if (stateId) {
       axios
         .get(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
         )
         .then((response) => {
           setDistrictList(response.data);
@@ -256,7 +256,7 @@ const LakshmiCollectionPaymentmethod = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Customer/CustomerAddressEdit`,
         {
           method: "POST",
           headers: {
@@ -382,7 +382,7 @@ const LakshmiCollectionPaymentmethod = () => {
     try {
       // Step 1: Update the LakshmiCollection (as before)
       let response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/UpdateLakshmiCollectionDetails/${collectionId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/UpdateLakshmiCollectionDetails/${collectionId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

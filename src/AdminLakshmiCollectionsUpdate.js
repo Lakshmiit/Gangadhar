@@ -53,7 +53,7 @@ const AdminLakshmiCollectionsUpdate = () => {
       try {
         setLoading(true);
         const collectionResponse = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
         );
         if (!collectionResponse.ok) {
           throw new Error("Product not found");
@@ -222,7 +222,7 @@ const AdminLakshmiCollectionsUpdate = () => {
       );
       formData.append("fileName", fileName);
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=` +
           fileName,
         {
           method: "POST",
@@ -285,7 +285,7 @@ const AdminLakshmiCollectionsUpdate = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${id}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${id}`,
         {
           method: "PUT",
           headers: {

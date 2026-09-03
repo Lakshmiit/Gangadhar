@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Same backend every other page in the app talks to.
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_ALL_VENDORS = `${API_BASE}/VendorRegistration/GetAllVendors`;
 const GET_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
 const UPDATE_VENDOR_PRODUCTS_VALUES = `${API_BASE}/VendorUploadProducts/UpdateVendorProductsValues`;

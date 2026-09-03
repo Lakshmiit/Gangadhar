@@ -5,7 +5,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // Same API host used across the rest of the live app (ProfilePage's
 // delivery-partner flow, VendorOrdersPage, DeliveryPartnerDashboard).
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 
 const DeliveryOrderDetailsPage = () => {
   const navigate = useNavigate();

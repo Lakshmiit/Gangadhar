@@ -19,7 +19,7 @@ import ImageCache from "./utils/ImageCache";
 import { getImageFilename, imageValueToUrl } from "./utils/imageSource";
 
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_VENDOR_ORDERS = `${API_BASE}/Mart/GetVendorOrdersByVendorId`;
 const UPDATE_ORDER = `${API_BASE}/Mart/UpdateProductDetails`;
 const GET_DELIVERYPARTNERS_BYVENDORID = `${API_BASE}/DeliveryPartner/GetDeliveryPartnerByVendorId`;

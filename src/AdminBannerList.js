@@ -93,7 +93,7 @@ const BannerList = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UpLoadBannners/GetBanners",
+        "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UpLoadBannners/GetBanners",
       );
       setBannersList(res.data || []);
     } catch (err) {
@@ -119,7 +119,7 @@ const BannerList = () => {
     const imageRequests =
       banner.image?.map((photo) =>
         fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo.images}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo.images}`,
         )
           .then((res) => res.json())
           .then((data) => ({
@@ -176,7 +176,7 @@ const BannerList = () => {
     if (!(await confirmDialog("Delete this banner?"))) return;
     try {
       await axios.delete(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UpLoadBannners/DeleteBanner/${id}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UpLoadBannners/DeleteBanner/${id}`,
       );
       alert("Banner deleted successfully");
       fetchBanners();
@@ -242,7 +242,7 @@ const BannerList = () => {
       };
 
       await axios.put(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UpLoadBannners/UpdateBannerDetails?id=${editBanner.id}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UpLoadBannners/UpdateBannerDetails?id=${editBanner.id}`,
         payload,
       );
 

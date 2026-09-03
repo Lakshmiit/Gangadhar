@@ -33,7 +33,7 @@ const AartmentRaiseTicketNotification = () => {
 
   useEffect(() => {
     setLoading(true);
-    const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/ApartmentRaiseTicket/GetGetApartmentMaintenanceForAdminList`;
+    const url = `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/ApartmentRaiseTicket/GetGetApartmentMaintenanceForAdminList`;
 
     axios
       .get(url)
@@ -77,7 +77,7 @@ const AartmentRaiseTicketNotification = () => {
     if (confirmDelete) {
       axios
         .delete(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/RaiseTicket/${ticketId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/RaiseTicket/${ticketId}`,
         )
         .then(() => {
           setTicketData((prevData) =>

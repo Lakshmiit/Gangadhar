@@ -39,7 +39,7 @@ const LakshmiCollectionCartPage = () => {
           return;
         }
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${uploadedId}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/GetLakshmiCollectionDetails/${uploadedId}`,
         );
         if (!response.ok) throw new Error("Failed to fetch collection details");
         const data = await response.json();
@@ -51,7 +51,7 @@ const LakshmiCollectionCartPage = () => {
             if (productImageFilename) {
               try {
                 const imgRes = await fetch(
-                  `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${productImageFilename}`,
+                  `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${productImageFilename}`,
                 );
                 const imgData = await imgRes.json();
                 if (imgData?.imageData) {
@@ -166,7 +166,7 @@ const LakshmiCollectionCartPage = () => {
 
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/UpdateLakshmiCollectionDetails/${uploadedId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/UpdateLakshmiCollectionDetails/${uploadedId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

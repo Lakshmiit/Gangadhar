@@ -88,7 +88,7 @@ const LakshmiCollectionDesigns = () => {
       setErr("");
       try {
         const res = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
         );
         if (!res.ok) throw new Error("Failed to fetch product");
         const data = await res.json();
@@ -100,7 +100,7 @@ const LakshmiCollectionDesigns = () => {
 
         const buildRequest = async (fileName) => {
           const r = await fetch(
-            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
+            `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(
               fileName,
             )}`,
           );
@@ -269,7 +269,7 @@ const LakshmiCollectionDesigns = () => {
       setPosting(true);
       setPostMsg(null);
       const res = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/LakshmiCollection/UploadColectionsDetails`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/LakshmiCollection/UploadColectionsDetails`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

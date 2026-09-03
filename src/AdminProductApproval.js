@@ -22,14 +22,14 @@ const ProductAdmin = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
         );
         const data = await response.json();
         setProductData(data);
         const imageRequests =
           data.productPhotos?.map((photo) =>
             fetch(
-              `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
+              `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${photo}`,
             )
               .then((res) => res.json())
               .then((data) => ({
@@ -68,7 +68,7 @@ const ProductAdmin = () => {
     };
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/Product/${id}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/Product/${id}`,
         {
           method: "PUT",
           headers: {

@@ -9,7 +9,7 @@ import { playNotificationSound } from "./notificationSound";
 // GetDeliveryPartnerDetailsByUserId / Mart endpoints resolve the same way
 // everywhere.
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const ASSIGNED_ORDERS_POLL_INTERVAL_MS = 20000;
 
 const DeliveryPartnerDashboard = () => {

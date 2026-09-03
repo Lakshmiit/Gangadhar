@@ -37,7 +37,7 @@ const UserIdLogin = () => {
       setError("");
       setSubmitted(true);
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UserOnBoarding/VerifyUserLogin?username=${userName}&password=${userPassword}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UserOnBoarding/VerifyUserLogin?username=${userName}&password=${userPassword}`,
         {
           method: "GET",
         },

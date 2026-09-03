@@ -214,7 +214,7 @@ const GroceryCard = () => {
     const fetchVendorProductLimits = async () => {
       try {
         const response = await axios.get(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/VendorUploadProducts/GetVendorProductsvalues?vendorId=${encodeURIComponent(
             vendorData.vendorId,
           )}`,
           {
@@ -468,80 +468,6 @@ const GroceryCard = () => {
     return idNum;
   }
 
-  // useEffect(() => {
-  //   if (!encodedCategory) return;
-  //   const decodedCat = decodeURIComponent(encodedCategory);
-  //   setSelectedCategory(decodedCat);
-  //   const controller = new AbortController();
-  //   let cancelled = false;
-  //   async function fetchProductsAndFirstImages() {
-  //     try {
-  //       setImageLoading(true);
-  //       const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
-  //       const { data: items } = await axios.get(url, { signal: controller.signal });
-  //       const safeItems = Array.isArray(items) ? items : [];
-  //       if (cancelled) return;
-  //       const sorted = [...safeItems].sort((a, b) => {
-  //         const tb = getItemTime(b);
-  //         const ta = getItemTime(a);
-  //         if (tb !== ta) return tb - ta;
-  //         return String(b.id).localeCompare(String(a.id));
-  //       });
-  //       const firstImages = safeItems
-  //         .map(p => ({ productId: p.id, photo: Array.isArray(p.images) ? p.images[0] : null }))
-  //         .filter(x => !!x.photo);
-  //       const cachedMap = {};
-  //       const misses = [];
-  //       for (const { productId, photo } of firstImages) {
-  //         const cached = ImageCache.getBase64(photo);
-  //         if (cached) {
-  //           cachedMap[productId] = [`data:image/jpeg;base64,${cached}`];
-  //         } else {
-  //           misses.push({ productId, photo });
-  //         }
-  //       }
-  //       setProducts(sorted);
-  //       if (Object.keys(cachedMap).length) setImageUrls(prev => ({ ...prev, ...cachedMap }));
-  //       if (cancelled) return;
-  //       const fetchOne = async ({ productId, photo }) => {
-  //         try {
-  //           const res = await fetch(
-  //             `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
-  //             { signal: controller.signal }
-  //           );
-  //           const json = await res.json();
-  //           const b64 = json?.imageData || "";
-  //           if (!b64) return;
-  //           ImageCachehandymanapiv14-cvccacc0cbggefds.centralindia-01.azurewebsites.net.setBase64(photo, b64);
-  //           const dataUrl = `data:image/jpeg;base64,${b64}`;
-  //           if (!cancelled) {
-  //             setImageUrls(prev => {
-  //               if (prev[productId]?.[0] === dataUrl) return prev;
-  //               return { ...prev, [productId]: [dataUrl] };
-  //             });
-  //           }
-  //         } catch (e) {
-  //         }
-  //       };
-
-  //       await Promise.allSettled(misses.map(fetchOne));
-  //     } catch (err) {
-  //       if (err?.name !== "CanceledError" && err?.name !== "AbortError") {
-  //         console.error("Error fetching grocery products:", err);
-  //         setProducts([]);
-  //         setImageUrls({});
-  //       }
-  //     } finally {
-  //       if (!cancelled) setImageLoading(false);
-  //     }
-  //   }
-  //   fetchProductsAndFirstImages();
-  //   return () => {
-  //     cancelled = true;
-  //     controller.abort();
-  //   };
-  // }, [encodedCategory]);
-
   useEffect(() => {
     if (vendorData?.isVendorGrocery) return;
     if (!encodedCategory) return;
@@ -554,7 +480,7 @@ const GroceryCard = () => {
     const fetchProducts = async () => {
       try {
         const url =
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/` +
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/` +
           `api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(
             decodedCat,
           )}`;
@@ -611,92 +537,6 @@ const GroceryCard = () => {
 
     return () => controller.abort();
   }, [encodedCategory, vendorData]);
-
-  // useEffect(() => {
-  // if (!encodedCategory) return;
-  // const decodedCat = decodeURIComponent(encodedCategory);
-  // setSelectedCategory(decodedCat);
-  // let cancelled = false;
-  // const controller = new AbortController();
-  // // const POLL_MS = 2000;
-  // // let pollId = null;
-  // async function fetchProductsAndFirstImages(warm = false, signal) {
-  // try {
-  // if (!warm) setImageLoading(true);
-  // const url = `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadGrocery/GetGroceryItemsBycategory?Category=${encodeURIComponent(decodedCat)}`;
-  // const { data: items } = await axios.get(url, { signal });
-  // const safeItems = Array.isArray(items) ? items : [];
-  // if (cancelled) return;
-  // const sorted = [...safeItems].sort((a, b) => {
-  // const stockA = Number(a.stockLeft || 0);
-  // const stockB = Number(b.stockLeft || 0);
-  // if (stockA <= 0 && stockB > 0) return 1;
-  // if (stockA > 0 && stockB <= 0) return -1;
-  // const timeA = getItemTime(a);
-  // const timeB = getItemTime(b);
-  // if (timeA !== timeB) return timeB - timeA;
-  // return String(b.id).localeCompare(String(a.id));
-  // });
-  // setProducts(sorted);
-  // if (warm) return;
-  // const firstImages = safeItems
-  // .map(p => ({ productId: p.id, photo: Array.isArray(p.images) ? p.images[0] : null }))
-  // .filter(x => !!x.photo);
-
-  // const cachedMap = {};
-  // const misses = [];
-  // for (const { productId, photo } of firstImages) {
-  // const cached = ImageCache.getBase64(photo);
-  // if (cached) {
-  // cachedMap[productId] = [`data:image/jpeg;base64,${cached}`];
-  // } else {
-  // misses.push({ productId, photo });
-  // }
-  // }
-
-  // if (Object.keys(cachedMap).length) {
-  // setImageUrls(prev => ({ ...prev, ...cachedMap }));
-  // }
-  // if (cancelled) return;
-  // const fetchOne = async ({ productId, photo }) => {
-  // try {
-  // const res = await fetch(
-  // `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(photo)}`,
-  //               { signal }
-  // );
-  // const json = await res.json();
-  // const b64 = json?.imageData || "";
-  // if (!b64) return;
-  // ImageCache.setBase64(photo, b64);
-  // const dataUrl = `data:image/jpeg;base64,${b64}`;
-  // if (!cancelled) {
-  // setImageUrls(prev => {
-  // if (prev[productId]?.[0] === dataUrl) return prev;
-  // return { ...prev, [productId]: [dataUrl] };
-  // });
-  // }
-  // } catch {}
-  // };
-  // await Promise.allSettled(misses.map(fetchOne));
-  // } catch (err) {
-  // if (err?.name !== "CanceledError" && err?.name !== "AbortError") {
-  // console.error("Error fetching grocery products:", err);
-  // if (!warm) {
-  // setProducts([]);
-  // setImageUrls({});
-  // }
-  // }
-  // } finally {
-  // if (!cancelled && !warm) setImageLoading(false);
-  // }
-  // }
-  // fetchProductsAndFirstImages(false, controller.signal);
-
-  // return () => {
-  // cancelled = true;
-  // controller.abort();
-  //  };
-  // }, [encodedCategory]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -1074,31 +914,6 @@ const GroceryCard = () => {
                               </div>
                             )}
                           </div>
-
-                          {/* <div className="row row-cols-3 row-cols-md-6 g-1">    
-        {firstCategories.map((cat) => (
-          <div
-            className="col"
-            key={cat.label}
-            // onClick={() => handleGroceryCategoryClick(cat)}
-            style={{ cursor: "pointer" }}
-          >
-            <div
-              className="groceryIcon-card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-between"
-              style={{ height: isMobile ? "130px" : "140px", width: isMobile ? "90px" : "120px", cursor: "pointer", padding: "6px", margin: "5px" }}
-            >
-              <img loading="lazy" decoding="async"
-                src={cat.image}
-                alt={cat.label}
-                style={{ height: "80px", width: "80px", borderRadius: "8px", marginTop: "2px", objectFit: "cover" }}
-              />
-              <span style={{ fontSize: "12px", fontWeight: "bold", marginTop: "6px", minHeight: "24px", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", lineHeight: "1.2" }}>
-                {cat.label}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div> */}
 
                           {/* Product Name */}
                           <h6

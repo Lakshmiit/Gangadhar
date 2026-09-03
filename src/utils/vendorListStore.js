@@ -12,7 +12,7 @@
 // // CACHE_TTL_MS, because the last good response per pincode is mirrored
 // // into sessionStorage (cleared automatically when the tab closes).
 
-// const API_BASE = "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+// const API_BASE = "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 // const GET_VENDORS_BY_PINCODE = `${API_BASE}/VendorUploadProducts/GetVendorsByPincode`;
 
 // const GET_VENDOR_PRODUCTS_BY_VENDOR_ID = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;
@@ -323,7 +323,7 @@ import axios from "axios";
 // into sessionStorage (cleared automatically when the tab closes).
 
 const API_BASE =
-  "https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api";
+  "https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api";
 const GET_VENDORS_BY_PINCODE = `${API_BASE}/VendorUploadProducts/GetVendorsByPincode`;
 
 const GET_VENDOR_PRODUCTS_BY_VENDOR_ID = `${API_BASE}/VendorUploadProducts/GetVendorProductsvalues`;

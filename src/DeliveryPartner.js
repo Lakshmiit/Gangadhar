@@ -61,7 +61,7 @@ const DeliveryPartner = () => {
   useEffect(() => {
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getStates`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getStates`,
       )
       .then((res) => {
         setStateList(res.data || []);
@@ -77,7 +77,7 @@ const DeliveryPartner = () => {
     }
     axios
       .get(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/MasterData/getDistricts/${stateId}`,
       )
       .then((res) => setDistrictList(res.data || []))
       .catch((err) => console.error("Error fetching districts:", err));
@@ -178,7 +178,7 @@ const DeliveryPartner = () => {
       fd.append("file", f, f.name);
       fd.append("fileName", f.name);
       const resp = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=${f.name}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/upload?filename=${f.name}`,
         { method: "POST", headers: { Accept: "text/plain" }, body: fd },
       );
       if (!resp.ok) {
@@ -243,7 +243,7 @@ const DeliveryPartner = () => {
       };
 
       const { status } = await axios.post(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/DeliveryPartner/UploadDeliveryPartnerDetails`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/DeliveryPartner/UploadDeliveryPartnerDetails`,
         payload,
         { headers: { "Content-Type": "application/json" } },
       );

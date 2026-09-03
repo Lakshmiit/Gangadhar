@@ -33,13 +33,13 @@ const AdminLakshmiCollectionsApproval = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
+          `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/GetLakshmiCollections?id=${id}`,
         );
         const data = await response.json();
         setCollectionData(data);
         const imagePromises = (data.images ?? []).map(async (file) => {
           const r = await fetch(
-            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(file)}`,
+            `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(file)}`,
           );
           const j = await r.json();
           const b64 = j.imageData || j.fileData || j.videoData;
@@ -51,7 +51,7 @@ const AdminLakshmiCollectionsApproval = () => {
         });
         const videoPromises = (data.videos ?? []).map(async (file) => {
           const r = await fetch(
-            `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(file)}`,
+            `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/FileUpload/download?generatedfilename=${encodeURIComponent(file)}`,
           );
           const j = await r.json();
           const b64 = j.videoData || j.fileData || j.imageData;
@@ -127,7 +127,7 @@ const AdminLakshmiCollectionsApproval = () => {
     };
     try {
       const response = await fetch(
-        `https://apiqa-b5cyfzbhhah5adc9.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${id}`,
+        `https://lmartapiv1-fxcyd2b4btacgsav.westus2-01.azurewebsites.net/api/UploadLakshmiCollection/UpdateLakshmiCollection?id=${id}`,
         {
           method: "PUT",
           headers: {
